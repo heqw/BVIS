@@ -13,6 +13,7 @@ var usersRouter = require('./routes/users');
 //first连接
 var fr = require('./routes/firstRouter');
 var maprouter = require('./routes/mapRoute');
+var wordCloudrouter = require('./routes/wordCloudRoute');
 
 var app = express();
 
@@ -39,6 +40,7 @@ app.set('view engine', 'html');
 //first连接
 app.use('/',fr);
 app.use('/', maprouter);
+app.use('/', wordCloudrouter);
 
 app.use(logger('dev'));
 app.use(express.json());

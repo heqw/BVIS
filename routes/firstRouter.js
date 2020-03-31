@@ -34,9 +34,10 @@ router.get('/find', function (req, res, next) {
 
         //连接到表。版本问题，如果不连数据库db()，直接连collection会报错
         const mydb = db.db('bikeData');
-        var collection = mydb.collection('station');
+        var collection = mydb.collection('trip');
         //查询数据
-        var whereStr = { "station_id": 'BT-03' };
+        //var whereStr = { "station_id": 'BT-03' };
+        var whereStr = { "trip_id": '432' };
         collection.find(whereStr).toArray(function (err, result) {
             if (err) {
                 console.log('Error:' + err);

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html >
+<html>
 
 <head>
     <meta charset="utf-8">
     <script src="../public/lib/jquery-3.4.1.min.js"></script>
 
-    <script src='https://api.mapbox.com/mapbox-gl-js/v0.40.0/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v0.40.0/mapbox-gl.css' rel='stylesheet' />
-    
+    <!-- <script src='https://api.mapbox.com/mapbox-gl-js/v0.40.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v0.40.0/mapbox-gl.css' rel='stylesheet' /> -->
+
     <!-- <link rel="stylesheet" href="../public/mapbox/mapbox-gl.css">
     <script src="../public/mapbox/mapbox-gl.js"></script> -->
     <!-- mapbox example 1 -->
@@ -18,12 +18,14 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css" rel="stylesheet" /> -->
 
+    <script src="../public/lib/d3.min.js"></script>
+
     <title>共享单车数据的用户时空行为特征可视分析系统</title>
     <style type="text/css">
-         body {
+        body {
             display: flex;
             flex-wrap: wrap;
-        } 
+        }
 
         /* #container1 {
             margin: 5px;
@@ -94,31 +96,57 @@
             border: solid 1px black;
         } */
 
-        #map{
+        #map {
             position: absolute;
             top: 8%;
             left: 20%;
             width: 60%;
             height: 85%;
         }
-         h1{font-size: 16px;} 
 
-         #headTitle{
-             position: absolute;
-             left: 38%;
-         }
+        #wordCloud {
+            position: absolute;
+            top: 8%;
+            left: 1%;
+            width: 18%;
+            height: 70%;
+        }
 
+        #wordCloudView {
+            position: absolute;
+            top: 10px;
+        }
+
+        h1 {
+            font-size: 16px;
+        }
+
+        #headTitle {
+            position: absolute;
+            left: 38%;
+            top: 1%;
+        }
+        .leftName{
+            position: absolute;
+            font-size: 12px;
+        }
     </style>
-   
+
 </head>
 
 <body>
     <div id="wholeView">
-        <div id = headTitle>
-            <h1 >共享单车数据的用户时空行为特征可视分析系统</h1>
+        <div id=headTitle>
+            <h1>共享单车数据的用户时空行为特征可视分析系统</h1>
         </div>
+
+        <div id="wordCloud">
+            <div class="leftName">词云</div>
+            <div id="wordCloudView"></div>
+        </div>
+
         
-        <div id = "weather">
+        <!-- <div id = "weather">
             <div class = "leftName">天气</div>
             <div id = "weatherView"></div>
         </div>
@@ -131,14 +159,14 @@
         <div id="location">
             <div class="leftName">单车站地理位置</div>
             <div id="locationView"></div>
-        </div>
+        </div> -->
 
-        <div id = "map">
+        <div id="map">
             <div class="mapName">行程路线</div>
             <div id="mapView"></div>
         </div>
 
-        <div id="dayLine">
+        <!-- <div id="dayLine">
             <div class="dayName">24小时时间分布</div>
             <div id="dayView"></div>
         </div>
@@ -151,9 +179,9 @@
         <div id="weekLine">
             <div class="weekName">一周时间分布</div>
             <div id="weekView"></div>
-        </div>
+        </div> -->
 
-    <!-- <div id="container1">
+        <!-- <div id="container1">
         <div class="frame">
             <h1>天气</h1>
         </div>
@@ -190,5 +218,6 @@
 </body>
 <!-- <script src="../public/js/firstReq.js"></script> -->
 <script src="../public/js/map.js"></script>
+<script src="../public/js/wordCloud.js"></script>
 
 </html>

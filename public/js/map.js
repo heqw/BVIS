@@ -14,9 +14,6 @@ var map = new mapboxgl.Map({
     //pitch: 50
 });
 
-//object 对象
-var mainChart = {};
-
 var stationData;
 DrawStation();
 function DrawStation() {
@@ -69,7 +66,7 @@ function DrawStation() {
             var data_point = {
                 "type": "FeatureCollection",//则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
                 "features": stationFeatures
-            }; console.log(stationFeatures);
+            }; //console.log(stationFeatures);
             map.on('load', function () {
                 //map.addSource(id,source)id为数据源id，这些数据源名叫id;source数据源对象,描述数据？
                 map.addSource("station_source", {
@@ -106,7 +103,7 @@ function DrawStation() {
                 //         "circle-stroke-width": 0.5
                 //     },
                 //     //过滤条件
-                //     "filter": ["==", "station_id", "WF-03"]
+                //     "filter": ["==", "station_id", ""]
                 // }, 'waterway-label');
             });
         },
