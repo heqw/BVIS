@@ -1,5 +1,5 @@
-var express = require('express');
-var router = express.Router();
+// var express = require('express');
+// var router = express.Router();
 
 // //连库查询形式一，网上教程2
 // var MongoClient = require('mongodb').MongoClient;
@@ -26,6 +26,8 @@ var router = express.Router();
 
 
 //连库查询形式二，对应liu
+var express = require('express');
+var router = express.Router();
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/";
 
@@ -37,8 +39,11 @@ router.get('/find', function (req, res, next) {
         var collection = mydb.collection('trip');
         //查询数据
         //var whereStr = { "station_id": 'BT-03' };
-        var whereStr = { "trip_id": '432' };
-        collection.find(whereStr).toArray(function (err, result) {
+        //var whereStr = { "trip_id": '432' };
+        collection.find({start_time: {
+            $gte: new Date(2014, 9, 27, 8, 0),
+            $lte: new Date(2014, 9, 27, 12, 59)
+        }}).toArray(function (err, result) {
             if (err) {
                 console.log('Error:' + err);
                 return;

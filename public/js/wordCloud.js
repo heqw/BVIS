@@ -12,7 +12,7 @@ function sendReq() {
         type: "GET",
         contentType: "application/json",
         beforeSend: function () { },
-        success: function (data, textStatus) { figureTime(data); },
+        success: function (data, textStatus) { console.log("wordREQ");figureTime(data); },
         complete: function () { },
         error: function () { }
     });
@@ -25,7 +25,7 @@ function figureTime(data) {
         return d.from_station_id
     })
 
-    //指定数组 rank_data 将被用于构建嵌套结构。rank_data存的是数据信息
+    //指定数组 data 将被用于构建嵌套结构。rank_data存的是数据信息
     //s是以station_name排序后的信息数组
     var s = nest.entries(data);
 
@@ -113,7 +113,7 @@ function draw(s) {
         //设置显示站名的字体、透明度、颜色
         .style({
             "font-size": function (d) {
-                return (d.useTime > 50) ? "50px" : d.useTime + "px";
+                return (d.useTime > 50) ? "50px" : d.useTime +5+ "px";
             },
             "fill": function (d) {
                 return compute(linear(d.useTime + 15)).toString();
@@ -125,4 +125,5 @@ function draw(s) {
         //给a标签添加 class 以及显示的内容
         .attr("class", "name_message")
         .text(function (d) { return d.key })
+        console.log("word");
 }

@@ -104,31 +104,22 @@
             height: 85%;
         }
 
-        #wordCloud {
-            position: absolute;
-            top: 8%;
-            left: 1%;
-            width: 18%;
-            height: 70%;
-        }
-
-        #wordCloudView {
-            position: absolute;
-            top: 10px;
-        }
-
-        h1 {
-            font-size: 16px;
-        }
-
         #headTitle {
+            font-size: 12px;
             position: absolute;
             left: 38%;
             top: 1%;
         }
-        .leftName{
+
+        .leftName {
             position: absolute;
             font-size: 12px;
+        }
+
+        #wholeView {
+            /* position: fixed; */
+            width: 100%;
+            height: 100%;
         }
     </style>
 
@@ -141,11 +132,14 @@
         </div>
 
         <div id="wordCloud">
-            <div class="leftName">词云</div>
+            <div class="leftName">单日单车站热度</div>
             <div id="wordCloudView"></div>
         </div>
 
-        
+        <div id="timeLine">
+            <div class="leftName">一周骑行时间分布</div>
+            <div id="timeLineView"></div>
+        </div>
         <!-- <div id = "weather">
             <div class = "leftName">天气</div>
             <div id = "weatherView"></div>
@@ -217,7 +211,12 @@
     </div> -->
 </body>
 <!-- <script src="../public/js/firstReq.js"></script> -->
+<link rel="stylesheet" href="../public/stylesheets/wordCloud.css">
+<link rel="stylesheet" href="../public/stylesheets/timeLine.css">
+
 <script src="../public/js/map.js"></script>
+<script src="../public/js/timeLine.js"></script>
 <script src="../public/js/wordCloud.js"></script>
+
 
 </html>

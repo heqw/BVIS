@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="../public/lib/jquery-3.4.1.min.js"></script>
+
+    <!-- <script src='https://api.mapbox.com/mapbox-gl-js/v0.40.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v0.40.0/mapbox-gl.css' rel='stylesheet' /> -->
+
+    <!-- <link rel="stylesheet" href="../public/mapbox/mapbox-gl.css">
+    <script src="../public/mapbox/mapbox-gl.js"></script> -->
+    <!-- mapbox example 1 -->
+    <!-- <script src='https://api.mapbox.com/mapbox-gl-js/v0.36.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v0.36.0/mapbox-gl.css' rel='stylesheet' /> -->
+    <!-- mapbox example 2 -->
+    <!-- <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css" rel="stylesheet" /> -->
+
+    <script src="../public/lib/d3.min.js"></script>
+
+    <title>测试</title>
+    <style type="text/css">
+        body {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #timeLine {
+            position: absolute;
+            top: 10%;
+            left: 5%;
+            height: 30%;
+            width: 30%;
+        }
+
+        #timeLineView {
+            position: absolute;
+            /* top: 10%; */
+            height: 100%;
+            width: 100%;
+        }
+
+
+        #headTitle {
+            font-size: small;
+            position: absolute;
+            left: 20%;
+            top: 1%;
+        }
+
+        #timeLineView .axis path,
+        .axis line {
+            fill: none;
+            stroke: rgb(0, 0, 0);
+            stroke-width: 1px;
+        }
+
+        #timeLineView .axis text {
+            fill: rgb(0, 0, 0);
+            font-size: 10px;
+        }
+
+        .leftName {
+            position: absolute;
+            font-size: 12px;
+        }
+
+        #wholeView {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="wholeView">
+        <div id=headTitle>
+            <h1>共享单车数据的用户时空行为特征可视分析系统</h1>
+        </div>
+
+        <div id="timeLine">
+            <div class="leftName">一周骑行时间分布</div>
+            <div id="timeLineView"></div>
+        </div>
+        <div id="wordCloud">
+            <div class="leftName">单日单车站热度</div>
+            <div id="wordCloudView"></div>
+        </div>
+
+</body>
+<!-- <script src="../public/js/firstReq.js"></script> -->
+<!-- <script src="../public/js/map.js"></script>
+<script src="../public/js/wordCloud.js"></script> -->
+<script src="../public/js/timeLine.js"></script>
+<link rel="stylesheet" href="../public/stylesheets/wordCloud.css">
+
+<script src="../public/js/timeLine.js"></script>
+<script src="../public/js/wordCloud.js"></script>
+
+</html>

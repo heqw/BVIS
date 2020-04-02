@@ -1,0 +1,14 @@
+        #wordCloud {
+            position: absolute;
+            top: 8%;
+            /* left: 50%; */
+            width: 19%;
+            height: 55%;
+        }
+
+        #wordCloudView {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+
