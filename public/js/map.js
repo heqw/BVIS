@@ -9,7 +9,7 @@ var map = new mapboxgl.Map({
     //A zoom level determines how much of the world is visible on a map，缩放级别
     zoom: 11.7,
     //Default map center in longitude and latitude.经度 纬度
-    center: [-122.328407,47.630748],
+    center: [-122.328407, 47.630748],
     //pitch in degrees倾斜度
     //pitch: 50
 });
@@ -37,7 +37,7 @@ function DrawStation() {
             //给每一个单车数据添加feature
             var stationFeatures = [];
             station.forEach(function (d) {
-                
+
                 stationFeatures.push({
                     "type": "Feature",//则该对象必须有属性 geometry，其值为一个几何对象；此外还有一个属性 properties，可以是任意 JSON 或 null
                     //properties里面可以封装各种属性，例如名称、标识颜色
@@ -59,8 +59,8 @@ function DrawStation() {
                         "type": "Point",
                         "coordinates": [d.long, d.lat]
                     }
-                }); 
-            }); 
+                });
+            });
 
             //data_point是车站的集合？
             var data_point = {
@@ -72,7 +72,7 @@ function DrawStation() {
                 map.addSource("station_source", {
                     "type": "geojson",
                     'data': data_point
-                }); 
+                });
                 // addLayer(layer,beforeid) layer需要添加的样式图层;beforeid 用来插入新图层的现有图层 ID
                 map.addLayer({
                     "id": "station",
@@ -83,12 +83,12 @@ function DrawStation() {
                     "paint": {
                         //点的属性
                         "circle-radius": 6,
-                        "circle-color": "#DC143C", 
+                        "circle-color": "#DC143C",
                         "circle-opacity": 1,
                         //点外层一圈的属性
                         "circle-stroke-color": "#9c9c9c",
                         "circle-stroke-width": 3,
-                        "circle-opacity":1
+                        "circle-opacity": 1
                     }
                 }, 'waterway-label');
 
@@ -105,6 +105,42 @@ function DrawStation() {
                 //     //过滤条件
                 //     "filter": ["==", "station_id", ""]
                 // }, 'waterway-label');
+
+
+                // Create a popup, but don't add it to the map yet.
+                var popup = new mapboxgl.Popup({
+                    closeButton: false,
+                    closeOnClick: false
+                });
+
+                map.on('mouseenter', 'station', function (e) {
+                    // Change the cursor style as a UI indicator.
+                    map.getCanvas().style.cursor = 'pointer';
+
+                    var coordinates = e.features[0].geometry.coordinates.slice();
+                    var description = 'NAME:'+ e.features[0].properties.description + '<p>'+'ID:'+e.features[0].properties.station_id;
+                   // var id = e.features[0].properties.station_id;
+
+                    // Ensure that if the map is zoomed out such that multiple
+                    // copies of the feature are visible, the popup appears
+                    // over the copy being pointed to.
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    }
+
+                    // Populate the popup and set its coordinates
+                    // based on the feature found.
+                    popup
+                        .setLngLat(coordinates)
+                        .setHTML(description)
+                        //.setHTML(id)
+                        .addTo(map);
+                });
+
+                map.on('mouseleave', 'station', function () {
+                    map.getCanvas().style.cursor = '';
+                    popup.remove();
+                });
             });
         },
         complete: function () { },
@@ -112,7 +148,7 @@ function DrawStation() {
     });
     //console.log(stationFeatures); console.log(typeof (stationFeatures));
 
-    
+
 }
 
 

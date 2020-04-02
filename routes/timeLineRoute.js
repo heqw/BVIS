@@ -10,8 +10,8 @@ router.get('/timeLineData', function (req, res, next) {
         var collection = mydb.collection('trip');
         collection.find({
             start_time: {
-                $gte: new Date(2014, 9, 13, 8, 0),
-                $lte: new Date(2014, 9, 20, 7, 59)
+                $gte: new Date(2014, 9, 20, 8, 0),
+                $lte: new Date(2014, 9, 27, 7, 59)
             }
         },
             {
