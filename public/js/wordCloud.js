@@ -1,5 +1,5 @@
-sendReq();
-function sendReq() {
+sendwordReq();
+function sendwordReq() {
     $.ajax({
         //参数url 发送请求的地址
         url: "http://localhost:3000/fromStation",
@@ -12,7 +12,7 @@ function sendReq() {
         type: "GET",
         contentType: "application/json",
         beforeSend: function () { },
-        success: function (data, textStatus) { console.log("wordREQ");figureTime(data); },
+        success: function (data, textStatus) { figureTime(data); },
         complete: function () { },
         error: function () { }
     });
@@ -125,5 +125,4 @@ function draw(s) {
         //给a标签添加 class 以及显示的内容
         .attr("class", "name_message")
         .text(function (d) { return d.key })
-        console.log("word");
 }

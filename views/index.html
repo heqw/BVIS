@@ -11,8 +11,8 @@
     <!-- <link rel="stylesheet" href="../public/mapbox/mapbox-gl.css">
     <script src="../public/mapbox/mapbox-gl.js"></script> -->
     <!-- mapbox example 1 -->
-    <script src='https://api.mapbox.com/mapbox-gl-js/v0.36.0/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v0.36.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="../public/mapbox/mapbox-gl.js"></script>
+    <link href="../public/mapbox/mapbox-gl.css" rel='stylesheet' />
     <!-- mapbox example 2 -->
     <!-- <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js"></script>
@@ -36,6 +36,14 @@
             height: 85%;
         }
 
+        #spiralLine {
+            position: absolute;
+            top: 8%;
+            left: 80%;
+            width: 18%;
+            height: 50%;
+        }
+
         #headTitle {
             font-size: 12px;
             position: absolute;
@@ -44,6 +52,13 @@
         }
 
         .leftName {
+            left: 1%;
+            position: absolute;
+            font-size: 12px;
+        }
+
+        .rightName {
+            /* right: 1px; */
             position: absolute;
             font-size: 12px;
         }
@@ -74,11 +89,14 @@
         </div>
 
         <div id="map">
-            <div class="mapName">行程路线</div>
+            <div class="mapName">单车站位置</div>
             <div id="mapView"></div>
         </div>
 
-
+        <div id="spiralLine">
+            <div class="rightName">一天骑行次数分布</div>
+            <div id="spiralLineView"></div>
+        </div>
 </body>
 <!-- <script src="../public/js/firstReq.js"></script> -->
 <link rel="stylesheet" href="../public/stylesheets/wordCloud.css">
@@ -87,6 +105,6 @@
 <script src="../public/js/map.js"></script>
 <script src="../public/js/timeLine.js"></script>
 <script src="../public/js/wordCloud.js"></script>
-
+<script src="../public/js/spiralLine.js"></script>
 
 </html>

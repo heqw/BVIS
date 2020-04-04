@@ -5,6 +5,7 @@ var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/";
 
 //在trip里查询单车站数据，以绘制wordCloud
+// spiralLine也使用了该路由
 router.get('/fromStation', function (req, res, next) {
     var selectData = function (db, callback) {
 

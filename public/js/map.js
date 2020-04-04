@@ -9,7 +9,7 @@ var map = new mapboxgl.Map({
     //A zoom level determines how much of the world is visible on a map，缩放级别
     zoom: 11.7,
     //Default map center in longitude and latitude.经度 纬度
-    center: [-122.328407, 47.630748],
+    center: [-122.319407, 47.630748],
     //pitch in degrees倾斜度
     //pitch: 50
 });

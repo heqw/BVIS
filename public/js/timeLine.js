@@ -11,7 +11,7 @@ function sendTimeReq() {
         contentType: "application/json",
         beforeSend: function () { },
         success: function (data, textStatus) {
-            console.log("timeREQ");
+            //console.log("timeREQ");
             data.forEach(function (d) {
                 d.week = new Date(d.start_time).getUTCDay();
             });
@@ -38,12 +38,12 @@ function handleData(data) {
     });
 
     drawtime(Data);
-    console.log(drawData);
-    console.log(Data);
+    //console.log(drawData);
+    //console.log(Data);
 }
 
 function drawtime(data) {
-    console.log("time1");
+    //console.log("time1");
 
     var time_line_wh = $("#timeLineView");
 
