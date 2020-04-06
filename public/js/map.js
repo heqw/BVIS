@@ -13,10 +13,31 @@ var map = new mapboxgl.Map({
     //pitch in degrees倾斜度
     //pitch: 50
 });
-
-var stationData;
+// var dayTripInfo;
+//console.log(stationInfo);
+var dayTripInfo;
 DrawStation();
 function DrawStation() {
+  
+
+    $.ajax({
+        url: "http://localhost:3000/fromStation",
+        dataType: 'json',
+        //crossDomain: false,
+        //data: {},
+        async: true,
+        type: "GET",
+        contentType: "application/json",
+        beforeSend: function () { },
+        success: function (Info, textStatus) {
+            dayTripInfo = Info; //console.log(dayTripInfo);
+        },
+        complete: function () { },
+        error: function () { }
+    });
+
+
+
 
     $.ajax({
         url: "http://localhost:3000/stationData",
@@ -29,126 +50,240 @@ function DrawStation() {
         beforeSend: function () { },
         //success: function(StrContent)里的这个参数，
         //任意命名的，在这个函数有用到。参数值是在Ajax提交成功后所返回的内容
-        success: function (station, textStatus) {
-            //console.log(station);
-            //console.log(typeof(station));
-            // stationData = station;
-
-            //给每一个单车数据添加feature
-            var stationFeatures = [];
-            station.forEach(function (d) {
-
-                stationFeatures.push({
-                    "type": "Feature",//则该对象必须有属性 geometry，其值为一个几何对象；此外还有一个属性 properties，可以是任意 JSON 或 null
-                    //properties里面可以封装各种属性，例如名称、标识颜色
-                    "properties": {
-                        "station_id": d.station_id,
-                        // 	描写(文字); 形容; 说明; 类型
-                        "description": d.name,
-                        "color": "#eae33f",
-                        //透明度
-                        "opacity": 0.2,
-                        //半径
-                        "radius": 1
-                    },
-                    //geometry,几何，几何图形
-                    //把这些要素封装到geometry，作为一个个的Feature（也就是要素），要素放到一个要素集合里
-                    //geojson点对象
-                    "geometry": {
-                        //geojson的地理要素
-                        "type": "Point",
-                        "coordinates": [d.long, d.lat]
-                    }
-                });
-            });
-
-            //data_point是车站的集合？
-            var data_point = {
-                "type": "FeatureCollection",//则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
-                "features": stationFeatures
-            }; //console.log(stationFeatures);
-            map.on('load', function () {
-                //map.addSource(id,source)id为数据源id，这些数据源名叫id;source数据源对象,描述数据？
-                map.addSource("station_source", {
-                    "type": "geojson",
-                    'data': data_point
-                });
-                // addLayer(layer,beforeid) layer需要添加的样式图层;beforeid 用来插入新图层的现有图层 ID
-                map.addLayer({
-                    "id": "station",
-                    "source": "station_source",
-                    //地图缩放的最小比列
-                    "minzoom": 2,
-                    "type": "circle",
-                    "paint": {
-                        //点的属性
-                        "circle-radius": 6,
-                        "circle-color": "#DC143C",
-                        "circle-opacity": 1,
-                        //点外层一圈的属性
-                        "circle-stroke-color": "#9c9c9c",
-                        "circle-stroke-width": 3,
-                        "circle-opacity": 1
-                    }
-                }, 'waterway-label');
-
-                // map.addLayer({
-                //     "id": "station-hover",
-                //     "source": "station_source",
-                //     "type": "circle",
-                //     "paint": {
-                //         "circle-radius": 10,
-                //         "circle-color": "#FF00FF", "circle-opacity": 1,
-                //         "circle-stroke-color": "#000080",
-                //         "circle-stroke-width": 0.5
-                //     },
-                //     //过滤条件
-                //     "filter": ["==", "station_id", ""]
-                // }, 'waterway-label');
-
-
-                // Create a popup, but don't add it to the map yet.
-                var popup = new mapboxgl.Popup({
-                    closeButton: false,
-                    closeOnClick: false
-                });
-
-                map.on('mouseenter', 'station', function (e) {
-                    // Change the cursor style as a UI indicator.
-                    map.getCanvas().style.cursor = 'pointer';
-
-                    var coordinates = e.features[0].geometry.coordinates.slice();
-                    var description = 'NAME:'+ e.features[0].properties.description + '<p>'+'ID:'+e.features[0].properties.station_id;
-                   // var id = e.features[0].properties.station_id;
-
-                    // Ensure that if the map is zoomed out such that multiple
-                    // copies of the feature are visible, the popup appears
-                    // over the copy being pointed to.
-                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-                    }
-
-                    // Populate the popup and set its coordinates
-                    // based on the feature found.
-                    popup
-                        .setLngLat(coordinates)
-                        .setHTML(description)
-                        //.setHTML(id)
-                        .addTo(map);
-                });
-
-                map.on('mouseleave', 'station', function () {
-                    map.getCanvas().style.cursor = '';
-                    popup.remove();
-                });
-            });
+        success: function (mapInfo, textStatus) {
+            //stationInfo=mapInfo;
+            drawMap(mapInfo);
         },
         complete: function () { },
         error: function () { console.log("maperror") }
     });
     //console.log(stationFeatures); console.log(typeof (stationFeatures));
 
+}
 
+function drawMap(station) {
+    //console.log(station);
+    //console.log(typeof(station));
+    // stationData = station;
+
+
+    // 存储单车站id、long、lat
+    var stationLongLat = [];
+    // 存储from_station_id to_station_id
+    var trips = [];
+    // 存储O的long lat,D的long lat,绘制路线
+    var od = [];
+    //给每一个单车数据添加feature
+    var stationFeatures = [];
+
+    station.forEach(function (d) {
+        stationFeatures.push({
+            "type": "Feature",//则该对象必须有属性 geometry，其值为一个几何对象；此外还有一个属性 properties，可以是任意 JSON 或 null
+            //properties里面可以封装各种属性，例如名称、标识颜色
+            "properties": {
+                "station_id": d.station_id,
+                // 	描写(文字); 形容; 说明; 类型
+                "description": d.name,
+                "color": "#eae33f",
+                //透明度
+                "opacity": 0.2,
+                //半径
+                "radius": 1
+            },
+            //geometry,几何，几何图形
+            //把这些要素封装到geometry，作为一个个的Feature（也就是要素），要素放到一个要素集合里
+            //geojson点对象
+            "geometry": {
+                //geojson的地理要素
+                "type": "Point",
+                "coordinates": [d.long, d.lat]
+            }
+        });
+
+        // data_10min.push({ date: newDate, value: sum });
+        stationLongLat.push({ stationID: d.station_id, stationLONG: d.long, stationLAT: d.lat });
+    }); //console.log('stationLongLat:'); console.log(stationLongLat);
+
+    // data_10min.push({ date: newDate, value: sum });
+    dayTripInfo.forEach(function (d) {
+        trips.push({ tripsFrom: d.from_station_id, tripsTo: d.to_station_id });
+    });
+    //console.log(trips.length);
+    trips.forEach(function (d) {
+        //console.log(stationLongLat.length);
+        for (var i = 0; i < stationLongLat.length; i++) {
+            // console.log("ssss");
+            if (stationLongLat[i].stationID == d.tripsFrom) {
+                d.fromLong = stationLongLat[i].stationLONG;
+                d.fromLat = stationLongLat[i].stationLAT;
+                // d.push({ fromLong: stationLongLat[i].stationLONG, fromLat: stationLongLat[i].stationLAT});
+            }
+            if (stationLongLat[i].stationID == d.tripsTo) {
+                d.toLong = stationLongLat[i].stationLONG;
+                d.toLat = stationLongLat[i].stationLAT;
+                // d.push({ toLong: stationLongLat[i].stationLONG, toLat: stationLongLat[i].stationLAT });
+            }
+        }
+    });
+    //  console.log("trips:");console.log(trips);
+
+
+
+
+    //data_point是车站的集合？画站点位置用
+    var data_point = {
+        "type": "FeatureCollection",//则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
+        "features": stationFeatures
+    }; //console.log(stationFeatures);
+
+
+    var colors = ["#EDC951", "#CC333F", "#00A0B0", "#ff5a29", "#2f71b0", "#55ff30", "#570eb0", "#883378"];
+    var buildLines = function () {
+        var features = [];
+        var curveness = 0.3;
+        for (var i = 0; i < trips.length; i++) {
+            var startLong = Number(trips[i].fromLong);
+            var startLat = Number(trips[i].fromLat);
+            var endLong = Number(trips[i].toLong);
+            var endLat = Number(trips[i].toLat); //console.log(typeof(endLat));
+            var control = [
+                (startLong + endLong) / 2 - (startLat - endLat) * curveness,
+                (startLat + endLat) / 2 - (startLong - endLong) * curveness
+            ];//console.log(control);
+
+            var t = 0;
+            var points = [];
+            while (t < 1) {
+                t += 0.001;
+                var x = Math.pow((1 - t), 2) * startLong + 2 * t * (1 - t) * control[0] + Math.pow(t, 2) * endLong;
+                var y = Math.pow((1 - t), 2) * startLat + 2 * t * (1 - t) * control[1] + Math.pow(t, 2) * endLat;
+
+                points.push([x, y]);
+            }
+            features.push({
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": points,
+                },
+                "properties": { "color": colors[i % colors.length] },
+            });
+        }
+        return features;
+    };
+
+    var data_line = {
+        "type": "FeatureCollection",//则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
+        "features": buildLines()
+    };//console.log(data_line);
+
+
+
+    map.on('load', function () {
+        //map.addSource(id,source)id为数据源id，这些数据源名叫id;source数据源对象,描述数据？
+        map.addSource("station_source", {
+            "type": "geojson",
+            'data': data_point
+        });
+        // addLayer(layer,beforeid) layer需要添加的样式图层;beforeid 用来插入新图层的现有图层 ID
+        map.addLayer({
+            "id": "station",
+            "source": "station_source",
+            //地图缩放的最小比列
+            "minzoom": 2,
+            "type": "circle",
+            "paint": {
+                //点的属性
+                "circle-radius": 6,
+                "circle-color": "#DC143C",
+                "circle-opacity": 1,
+                //点外层一圈的属性
+                "circle-stroke-color": "#9c9c9c",
+                "circle-stroke-width": 3,
+                "circle-opacity": 1
+            }
+        }, 'waterway-label');
+
+        // map.addLayer({
+        //     "id": "station-hover",
+        //     "source": "station_source",
+        //     "type": "circle",
+        //     "paint": {
+        //         "circle-radius": 10,
+        //         "circle-color": "#FF00FF", "circle-opacity": 1,
+        //         "circle-stroke-color": "#000080",
+        //         "circle-stroke-width": 0.5
+        //     },
+        //     //过滤条件
+        //     "filter": ["==", "station_id", ""]
+        // }, 'waterway-label');
+
+
+
+
+
+
+        map.addSource("chart-lines", {
+            "type": "geojson",           /* geojson类型资源 */
+            "data": data_line
+        });
+
+        map.addLayer({
+            "id": "route",
+            "type": "line",
+            "source": "chart-lines",
+            "layout": {
+                "line-join": "round",
+                "line-cap": "round"
+            },
+            "paint": {
+                "line-color": ["get", "color"],
+                "line-width": 2
+            }
+        });
+
+
+
+
+
+
+
+
+        // Create a popup, but don't add it to the map yet.
+        var popup = new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: false
+        });
+
+        map.on('mouseenter', 'station', function (e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var description = 'NAME:' + e.features[0].properties.description + '<p>' + 'ID:' + e.features[0].properties.station_id;
+            // var id = e.features[0].properties.station_id;
+
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup
+                .setLngLat(coordinates)
+                .setHTML(description)
+                //.setHTML(id)
+                .addTo(map);
+        });
+
+        map.on('mouseleave', 'station', function () {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+    });
 }
 
 
