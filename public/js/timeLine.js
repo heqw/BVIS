@@ -31,20 +31,37 @@ function handleData(data) {
     var drawData = nest.entries(data);
 
     var i = 0;
-    var Data = [];
+    var memberData = [];
+    var shortData = [];
     drawData.forEach(function (d) {
-
-        Data.push({ key: d.key, daySum: d.values.length });
+        var memberSum = 0;
+        var shortSum = 0;
+        for (var i = 0; i < d.values.length; i++) {
+            if (d.values[i].user_type == "Member") memberSum++;
+            else shortSum++;
+        }
+        memberData.push({ key: d.key, daySum: memberSum });
+        shortData.push({ key: d.key, daySum: shortSum });
+        console.log("data.length"); console.log(data.length);
+        console.log("d.values.length"); console.log(d.values.length);
+        console.log("memberSum");console.log(memberSum);
+        console.log("shortSum"); console.log(shortSum);
     });
+    var userData=[];
+    userData.push(memberData);
+    userData.push(shortData);
 
-    drawtime(Data);
-    //console.log(drawData);
-    //console.log(Data);
+    drawtime(userData);
+    // drawtime(memberData);
+    // drawtime(shortData);
+    console.log(userData);
+    console.log(memberData);
+    console.log(shortData);
 }
 
 function drawtime(data) {
     //console.log("time1");
-
+    var color = ["#FFD700", "#9d2933"];
     var time_line_wh = $("#timeLineView");
 
     var margin = { top: 20, right: 20, bottom: 20, left: 0 },
@@ -58,7 +75,7 @@ function drawtime(data) {
         .range([0, width]);
 
     var y_scale = d3.scale.linear()
-        .domain([200, 800])
+        .domain([0, 500])
         .range([height - 40, 0]);
 
     var x_axis = d3.svg.axis()
@@ -86,7 +103,7 @@ function drawtime(data) {
         .call(y_axis);
 
 
-    var line = d3.svg.line().x(function (d) {
+    var line = d3.svg.line().x(function (d,i) {
         return x_scale(parseInt(d.key));
     }).y(function (d) {
         return y_scale(d.daySum);
@@ -95,7 +112,9 @@ function drawtime(data) {
 
     var routes_g = svg.append("g")
         .attr("transform", "translate(" + (margin.left + 30) + ",20)");
-
+    // var routes_s = svg.append("g")
+    //     .attr("transform", "translate(" + (margin.left + 30) + ",20)");
+    // member
     var routes = routes_g.selectAll(".route_line")
         .data(data)
         .enter()
@@ -105,11 +124,30 @@ function drawtime(data) {
     routes.append("path")
         .attr('fill', "none")
         .attr('opacity', 0.6)
-        .attr('stroke', "#9d2933")
-        .attr("stroke-width", 2)
-        .attr("d", function (d) {
-            return line(data)
+        .attr('stroke', function (d, i) {
+            return color[i];
         })
+        .attr("stroke-width", 2)
+        .attr("d", function (d,i) {
+            return line(data[i])
+        })
+
+
+    // short user
+    // var sroutes = routes_s.selectAll(".route_line")
+    //     .data(sdata)
+    //     .enter()
+    //     .append("g")
+    //     .attr("class", function (d) { return "routes_line route_" + parseInt(d.key) });
+
+    // sroutes.append("path")
+    //     .attr('fill', "none")
+    //     .attr('opacity', 0.6)
+    //     .attr('stroke', "#9d2933")
+    //     .attr("stroke-width", 2)
+    //     .attr("d", function (d) {
+    //         return line(sdata)
+    //     })
 }
 
 
