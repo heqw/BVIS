@@ -15,10 +15,10 @@ var map = new mapboxgl.Map({
 });
 // var dayTripInfo;
 //console.log(stationInfo);
-var dayTripInfo;
+
 DrawStation();
 function DrawStation() {
-  
+    var daytripInfo;
 
     $.ajax({
         url: "http://localhost:3000/fromStation",
@@ -30,7 +30,7 @@ function DrawStation() {
         contentType: "application/json",
         beforeSend: function () { },
         success: function (Info, textStatus) {
-            dayTripInfo = Info; //console.log(dayTripInfo);
+            daytripInfo = Info; //console.log(dayTripInfo);
         },
         complete: function () { },
         error: function () { }
@@ -52,7 +52,7 @@ function DrawStation() {
         //任意命名的，在这个函数有用到。参数值是在Ajax提交成功后所返回的内容
         success: function (mapInfo, textStatus) {
             //stationInfo=mapInfo;
-            drawMap(mapInfo);
+            drawMap(mapInfo, daytripInfo);
         },
         complete: function () { },
         error: function () { console.log("maperror") }
@@ -61,7 +61,7 @@ function DrawStation() {
 
 }
 
-function drawMap(station) {
+function drawMap(station, dayTripInfo) {
     //console.log(station);
     //console.log(typeof(station));
     // stationData = station;
@@ -104,11 +104,64 @@ function drawMap(station) {
         stationLongLat.push({ stationID: d.station_id, stationLONG: d.long, stationLAT: d.lat });
     }); //console.log('stationLongLat:'); console.log(stationLongLat);
 
-    // data_10min.push({ date: newDate, value: sum });
+
+
+
+    // 反应很慢，打不开   
+    // var a = 1;
+    // trips.push({ tripsFrom: dayTripInfo[0].from_station_id, tripsTo: dayTripInfo[0].to_station_id, tripsSum: a });
+    // // console.log(trips);
+    // // console.log(typeof (trips[0].tripsSum));
+    // // console.log(trips[0].tripsSum);
+    // // console.log(typeof (trips[0].tripsFrom));
+    // // console.log(typeof(trips[0].tripsSum));
+
+    // dayTripInfo.forEach(function (d) {
+    //     var sum = 1;
+    //     trips.forEach(function (s) {
+    //         if (s.tripsFrom == d.from_station_id && s.tripsTo == d.to_station_id)
+    //         {
+    //             // s.tripsSum=Number(s.tripsSum)++;
+    //             s.tripsSum++;
+    //             console.log(s.tripsSum);
+    //         }
+
+    //         else trips.push({ tripsFrom: d.from_station_id, tripsTo: d.to_station_id, tripsSum: sum });
+    //     })
+    // });
+    // console.log(trips);
+
+
+
+
+
+    // trips计算sum
     dayTripInfo.forEach(function (d) {
-        trips.push({ tripsFrom: d.from_station_id, tripsTo: d.to_station_id });
+        var sum = 1;
+        od.push({ odFrom: d.from_station_id, odTo: d.to_station_id, odSum: sum });
     });
-    //console.log(trips.length);
+    var nest = d3.nest()
+        .key(function (d) { return d.odFrom; })
+        .key(function (d) { return d.odTo; });
+    var odnest = nest.entries(od);
+    // console.log('odnest:');
+    // console.log(odnest);
+
+    odnest.forEach(function (d) {
+        var i = 0;
+        for (i = 0; i < d.values.length; i++)
+            trips.push({ tripsFrom: d.key, tripsTo: d.values[i].key, tripsSum: d.values[i].values.length });
+    }); console.log(trips);
+
+
+
+    // // trips未计算sum
+    // dayTripInfo.forEach(function (d) {
+    //     var sum = 1;
+    //     trips.push({ tripsFrom: d.from_station_id, tripsTo: d.to_station_id, tripsSum: sum });
+    // }); console.log(trips);
+
+
     trips.forEach(function (d) {
         //console.log(stationLongLat.length);
         for (var i = 0; i < stationLongLat.length; i++) {
@@ -128,8 +181,6 @@ function drawMap(station) {
     //  console.log("trips:");console.log(trips);
 
 
-
-
     //data_point是车站的集合？画站点位置用
     var data_point = {
         "type": "FeatureCollection",//则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
@@ -137,48 +188,104 @@ function drawMap(station) {
     }; //console.log(stationFeatures);
 
 
-    var colors = ["#EDC951", "#CC333F", "#00A0B0", "#ff5a29", "#2f71b0", "#55ff30", "#570eb0", "#883378"];
+
+    //              黄色、    淡暗红色、 雾霾蓝色、  橘色、     蓝紫色（偏蓝） 荧光绿、  蓝紫（偏紫） 紫色
+    // var colors = ["#EDC951", "#CC333F", "#00A0B0", "#ff5a29", "#2f71b0", "#55ff30", "#570eb0", "#883378"];
+    //           2-3           4-7        8-11        12-15       16-19
+    //             深卡其布    黄色         纯红        耐火砖       栗色
+    var colors = ["#BDB76B","#EDC951",  "#FF0000", "#B22222", "#800000"];
     var buildLines = function () {
         var features = [];
         var curveness = 0.3;
         for (var i = 0; i < trips.length; i++) {
-            var startLong = Number(trips[i].fromLong);
-            var startLat = Number(trips[i].fromLat);
-            var endLong = Number(trips[i].toLong);
-            var endLat = Number(trips[i].toLat); //console.log(typeof(endLat));
-            var control = [
-                (startLong + endLong) / 2 - (startLat - endLat) * curveness,
-                (startLat + endLat) / 2 - (startLong - endLong) * curveness
-            ];//console.log(control);
+            if (trips[i].tripsSum > 2) {
+                var startLong = Number(trips[i].fromLong);
+                var startLat = Number(trips[i].fromLat);
+                var endLong = Number(trips[i].toLong);
+                var endLat = Number(trips[i].toLat); //console.log(typeof(endLat));
+                var control = [
+                    (startLong + endLong) / 2 - (startLat - endLat) * curveness,
+                    (startLat + endLat) / 2 - (startLong - endLong) * curveness
+                ];//console.log(control);
 
-            var t = 0;
-            var points = [];
-            while (t < 1) {
-                t += 0.001;
-                var x = Math.pow((1 - t), 2) * startLong + 2 * t * (1 - t) * control[0] + Math.pow(t, 2) * endLong;
-                var y = Math.pow((1 - t), 2) * startLat + 2 * t * (1 - t) * control[1] + Math.pow(t, 2) * endLat;
+                var t = 0;
+                var points = [];
+                while (t < 1) {
+                    t += 0.001;
+                    var x = Math.pow((1 - t), 2) * startLong + 2 * t * (1 - t) * control[0] + Math.pow(t, 2) * endLong;
+                    var y = Math.pow((1 - t), 2) * startLat + 2 * t * (1 - t) * control[1] + Math.pow(t, 2) * endLat;
 
-                points.push([x, y]);
+                    points.push([x, y]);
+                }
+                features.push({
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": points,
+                    },
+                    "properties": {
+                        "color": colors[Math.floor(trips[i].tripsSum / 4)],
+                        "line-width": trips[i].tripsSum
+                    },
+                }); //console.log(Math.floor(trips[i].tripsSum / 4));
             }
-            features.push({
-                "type": "Feature",
-                "geometry": {
-                    "type": "LineString",
-                    "coordinates": points,
-                },
-                "properties": { "color": colors[i % colors.length] },
-            });
         }
         return features;
     };
 
+    // 画贝塞尔的运动点
+    var buildPoints = function (time) {
+        var features = [];
+        var curveness = 0.3;
+        for (var i = 0; i < trips.length; i++) {
+            if (trips[i].tripsSum > 2) {
+                var startLong = Number(trips[i].fromLong);
+                var startLat = Number(trips[i].fromLat);
+                var endLong = Number(trips[i].toLong);
+                var endLat = Number(trips[i].toLat); //console.log(typeof(endLat));
+                var control = [
+                    (startLong + endLong) / 2 - (startLat - endLat) * curveness,
+                    (startLat + endLat) / 2 - (startLong - endLong) * curveness
+                ];//console.log(control);
+
+                // 为了绘制彗星尾迹，需要同时画出count个半径递增的圆点
+                var count = 200;
+                // 最大圆点的半径
+                var maxRadius = 2;
+                // 求出当前时间点小圆点的坐标
+                var t = time;
+                for (var j = 0; j < count; j++) {
+                    t += 0.001;
+                    if (t > 1) break;
+                    var x = Math.pow((1 - t), 2) * startLong + 2 * t * (1 - t) * control[0] + Math.pow(t, 2) * endLong;
+                    var y = Math.pow((1 - t), 2) * startLat + 2 * t * (1 - t) * control[1] + Math.pow(t, 2) * endLat;
+
+                    features.push({
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [x, y],
+                        },
+                        // Math.floor(trips[i].tripsSum / 4 有的是0，所以+1保证非零
+                        "properties": { "radius": (Math.floor(trips[i].tripsSum / 4)+1)*2.8 * j / count, "color": colors[Math.floor(trips[i].tripsSum / 4)] },
+                    });
+                }
+            }
+        }
+        return features;
+    };
+
+
+
+
+    //画贝塞尔曲线的source 
     var data_line = {
         "type": "FeatureCollection",//则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
         "features": buildLines()
     };//console.log(data_line);
 
 
-
+    // 加载站点
     map.on('load', function () {
         //map.addSource(id,source)id为数据源id，这些数据源名叫id;source数据源对象,描述数据？
         map.addSource("station_source", {
@@ -222,7 +329,7 @@ function drawMap(station) {
 
 
 
-
+        // 加载贝塞尔曲线
         map.addSource("chart-lines", {
             "type": "geojson",           /* geojson类型资源 */
             "data": data_line
@@ -238,11 +345,35 @@ function drawMap(station) {
             },
             "paint": {
                 "line-color": ["get", "color"],
-                "line-width": 2
+                // 根据tripsSum设定线的宽度
+                "line-width": ["get", "line-width"]
             }
         });
 
 
+
+
+        // 加载贝塞尔曲线运动点
+        map.addSource("chart-points", {
+            "type": "geojson",           /* geojson类型资源 */
+            "data": {                    /* geojson数据 */
+                "type": "FeatureCollection",
+                "features": buildPoints(0.1)
+            }
+        });
+        map.addLayer({
+            "id": "chart-points",
+            "type": "circle",          /* circle类型表示一个圆，一般比较小 */
+            "source": "chart-points",
+            "paint": {
+                "circle-radius": ["get", "radius"],
+                "circle-color": ["get", "color"],  /* 圆的颜色 */
+                "circle-stroke-width": 1,  /* 边框宽度 */
+                "circle-stroke-color": ["get", "color"],  /* 边框的颜色 */
+                "circle-opacity": 0.5,
+                "circle-pitch-alignment": "map"
+            }
+        });
 
 
 
