@@ -1,0 +1,1 @@
+var quanjubianliang= new Date();

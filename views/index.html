@@ -18,6 +18,12 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css" rel="stylesheet" /> -->
 
+
+    <link href="../public/lib/bootstrap.css" rel="stylesheet" />
+    <link href="../public/lib/bootstrap-datetimepicker.css" rel="stylesheet" />
+    <script src="../public/lib/bootstrap-datetimepicker.js"></script>
+    <script src="../public/lib/bootstrap-datetimepicker.zh-CN.js"></script>
+
     <script src="../public/lib/d3.min.js"></script>
 
     <title>共享单车数据的用户时空行为特征可视分析系统</title>
@@ -31,25 +37,36 @@
         #map {
             position: absolute;
             top: 8%;
-            left: 20%;
-            width: 60%;
+            left: 22%;
+            width: 56%;
             height: 85%;
         }
 
         #spiralLine {
             position: absolute;
             top: 8%;
-            left: 80%;
-            width: 18%;
+            left: 78%;
+            width: 22%;
             height: 50%;
         }
 
         #headTitle {
-            font-size: 12px;
+            /* font-size: 2px; */
             position: absolute;
-            left: 31%;
+            left: 30%;
             top: 1%;
         }
+
+
+        #calendar{
+            position: absolute;
+            top: 59%;
+            left: 78%;
+            width: 22%;
+            height: 20%;
+        }
+
+
 
         .leftName {
             left: 1%;
@@ -63,10 +80,18 @@
             font-size: 12px;
         }
 
+
+        /* .input-append date form_datetime{
+            
+        } */
+
+
+        h1{font-size : 25px;}
+
         #wholeView {
             /* position: fixed; */
             width: 100%;
-            height: 100%;
+            height: 650px;
         }
     </style>
 
@@ -97,14 +122,25 @@
             <div class="rightName">一天骑行次数分布</div>
             <div id="spiralLineView"></div>
         </div>
+        <div id="calendar">
+            <div class="input-append date form_datetime">
+                <input size="16" type="text" value="" name="startTime" readonly>
+                <span class="add-on">
+                    <i class="icon-th"></i></span>
+            </div>
+        </div>
 </body>
 <!-- <script src="../public/js/firstReq.js"></script> -->
 <link rel="stylesheet" href="../public/stylesheets/wordCloud.css">
 <link rel="stylesheet" href="../public/stylesheets/timeLine.css">
 
+<script src="../public/js/bianliang.js"></script>
+<script src="../public/js/calendar.js"></script>
 <script src="../public/js/map.js"></script>
+<script src="../public/js/spiralLine.js"></script>
+<script src="../public/js/getInfo.js"></script>
+<script src="../public/js/main.js"></script>
 <script src="../public/js/timeLine.js"></script>
 <script src="../public/js/wordCloud.js"></script>
-<script src="../public/js/spiralLine.js"></script>
 
 </html>

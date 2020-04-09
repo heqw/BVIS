@@ -15,6 +15,8 @@ var fr = require('./routes/firstRouter');
 var maprouter = require('./routes/mapRoute');
 var wordCloudrouter = require('./routes/wordCloudRoute');
 var timeLinerouter = require('./routes/timeLineRoute');
+var spiralLinerouter = require('./routes/spiralLineRoute');
+var getInforouter = require('./routes/getInfoRoute');
 
 var app = express();
 
@@ -43,6 +45,8 @@ app.use('/',fr);
 app.use('/', maprouter);
 app.use('/', wordCloudrouter);
 app.use('/', timeLinerouter);
+app.use('/', getInforouter);
+app.use('/', spiralLinerouter);
 
 app.use(logger('dev'));
 app.use(express.json());

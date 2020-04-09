@@ -13,31 +13,43 @@ var map = new mapboxgl.Map({
     //pitch in degrees倾斜度
     //pitch: 50
 });
-// var dayTripInfo;
+//  var daytripInfo;
 //console.log(stationInfo);
 
+// var dayTripInfo;
 DrawStation();
 function DrawStation() {
-    var daytripInfo;
+// var daytripInfo;
 
     $.ajax({
-        url: "http://localhost:3000/fromStation",
+        url: "http://localhost:3000/spiralLineData",
         dataType: 'json',
         //crossDomain: false,
         //data: {},
+        data: {
+            sstartyear: a.getyear,
+            sstartmonth: a.getmonth,
+            sstartday: a.getday,
+            sendyear: a.endYear,
+            sendmonth: a.endMonth,
+            sendday: a.endDay
+        },
         async: true,
         type: "GET",
         contentType: "application/json",
         beforeSend: function () { },
         success: function (Info, textStatus) {
-            daytripInfo = Info; //console.log(dayTripInfo);
+            // var daytripInfo = Info; console.log(daytripInfo);
+            console.log(Info);
+            senddaytripInfo(Info);
         },
         complete: function () { },
         error: function () { }
     });
 
-
-
+    //console.log(daytripInfo);
+}
+function senddaytripInfo(In){
 
     $.ajax({
         url: "http://localhost:3000/stationData",
@@ -52,7 +64,7 @@ function DrawStation() {
         //任意命名的，在这个函数有用到。参数值是在Ajax提交成功后所返回的内容
         success: function (mapInfo, textStatus) {
             //stationInfo=mapInfo;
-            drawMap(mapInfo, daytripInfo);
+            drawMap(mapInfo, In); //console.log(daytripInfo);
         },
         complete: function () { },
         error: function () { console.log("maperror") }
@@ -61,7 +73,7 @@ function DrawStation() {
 
 }
 
-function drawMap(station, dayTripInfo) {
+function drawMap(station,dayTripInfo) {
     //console.log(station);
     //console.log(typeof(station));
     // stationData = station;
@@ -193,7 +205,7 @@ function drawMap(station, dayTripInfo) {
     // var colors = ["#EDC951", "#CC333F", "#00A0B0", "#ff5a29", "#2f71b0", "#55ff30", "#570eb0", "#883378"];
     //           2-3           4-7        8-11        12-15       16-19
     //             深卡其布    黄色         纯红        耐火砖       栗色
-    var colors = ["#BDB76B","#EDC951",  "#FF0000", "#B22222", "#800000"];
+    var colors = ["#BDB76B", "#EDC951", "#FF0000", "#B22222", "#800000"];
     var buildLines = function () {
         var features = [];
         var curveness = 0.3;
@@ -267,7 +279,7 @@ function drawMap(station, dayTripInfo) {
                             "coordinates": [x, y],
                         },
                         // Math.floor(trips[i].tripsSum / 4 有的是0，所以+1保证非零
-                        "properties": { "radius": (Math.floor(trips[i].tripsSum / 4)+1)*2.8 * j / count, "color": colors[Math.floor(trips[i].tripsSum / 4)] },
+                        "properties": { "radius": (Math.floor(trips[i].tripsSum / 4) + 1) * 2.8 * j / count, "color": colors[Math.floor(trips[i].tripsSum / 4)] },
                     });
                 }
             }

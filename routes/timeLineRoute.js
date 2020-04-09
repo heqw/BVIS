@@ -4,14 +4,20 @@ var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/";
 
 router.get('/timeLineData', function (req, res, next) {
+    var tstayear = req.query.tstartyear;
+    var tstamonth = req.query.tstartmonth;
+    var tstaday = req.query.tstartday;
+    var tendyear = req.query.tendyear;
+    var tendmonth = req.query.tendmonth;
+    var tendday = req.query.tendday;
     var selectData = function (db, callback) {
 
         const mydb = db.db('bikeData');
         var collection = mydb.collection('trip');
         collection.find({
             start_time: {
-                $gte: new Date(2014, 9, 13, 8, 0),
-                $lte: new Date(2014, 9, 20, 7, 59)
+                $gte: new Date(tstayear, tstamonth, tstaday, 8, 0),
+                $lte: new Date(tendyear, tendmonth, tendday, 7, 59)
             }
         },
             {
@@ -24,7 +30,7 @@ router.get('/timeLineData', function (req, res, next) {
                 "to_station_name":0,
                 "from_station_id":0,
                 "to_station_id":0,
-                "user_type":0,
+                // "user_type":0,
                 "gender":0,
                 "birth_year":0
             }).toArray(function (err, result) {

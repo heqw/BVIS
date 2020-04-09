@@ -17,3 +17,4 @@ function sendReq() {
         error: function () { console.log("error!") }
     });
 }
+

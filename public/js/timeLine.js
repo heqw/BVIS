@@ -5,13 +5,20 @@ function sendTimeReq() {
         url: "http://localhost:3000/timeLineData",
         dataType: 'json',
         crossDomain: false,
-        data: {},
+        data: {
+            tstartyear: a.weekStartYear,
+            tstartmonth: a.weekStartMonth,
+            tstartday: a.weekStartDay,
+            tendyear: a.weekEndYear,
+            tendmonth: a.weekEndMonth,
+            tendday: a.weekEndDay
+        },
         async: true,
         type: "GET",
         contentType: "application/json",
         beforeSend: function () { },
         success: function (data, textStatus) {
-            //console.log("timeREQ");
+            console.log("data"); console.log(data);
             data.forEach(function (d) {
                 d.week = new Date(d.start_time).getUTCDay();
             });
@@ -42,19 +49,19 @@ function handleData(data) {
         }
         memberData.push({ key: d.key, daySum: memberSum });
         shortData.push({ key: d.key, daySum: shortSum });
-        console.log("data.length"); console.log(data.length);
-        console.log("d.values.length"); console.log(d.values.length);
-        console.log("memberSum");console.log(memberSum);
-        console.log("shortSum"); console.log(shortSum);
+        // console.log("data.length"); console.log(data.length);
+        // console.log("d.values.length"); console.log(d.values.length);
+        // console.log("memberData"); console.log(memberData);
+        // console.log("shortData"); console.log(shortData);
     });
-    var userData=[];
+    var userData = [];
     userData.push(memberData);
     userData.push(shortData);
 
     drawtime(userData);
     // drawtime(memberData);
     // drawtime(shortData);
-    console.log(userData);
+    // console.log(userData);
     console.log(memberData);
     console.log(shortData);
 }
@@ -75,7 +82,7 @@ function drawtime(data) {
         .range([0, width]);
 
     var y_scale = d3.scale.linear()
-        .domain([0, 500])
+        .domain([0, 700])
         .range([height - 40, 0]);
 
     var x_axis = d3.svg.axis()
@@ -89,8 +96,8 @@ function drawtime(data) {
     var svg = d3.select("#timeLineView").append("svg")
         .attr("id", "time_line_svg")
         .attr("width", width)
-        .attr("height", height)
-        .attr("transform", "translate(" + margin.left + "," + margin.top * 2 + ")");
+        .attr("height", height+50)
+        .attr("transform", "translate(" + margin.left + "," + margin.top  + ")");
 
     svg.append("g")
         .attr("class", "x axis")
@@ -103,7 +110,7 @@ function drawtime(data) {
         .call(y_axis);
 
 
-    var line = d3.svg.line().x(function (d,i) {
+    var line = d3.svg.line().x(function (d, i) {
         return x_scale(parseInt(d.key));
     }).y(function (d) {
         return y_scale(d.daySum);
@@ -128,10 +135,26 @@ function drawtime(data) {
             return color[i];
         })
         .attr("stroke-width", 2)
-        .attr("d", function (d,i) {
+        .attr("d", function (d, i) {
             return line(data[i])
         })
-
+    var weather=['rain','rain','sunny','frog','rain','rain','rain'];
+        svg.selectAll(".text")
+            .data(weather)
+            .enter()
+            .append("text")
+            .text(function (d) {
+                return d;
+            })
+            .attr("fill", "black")
+            .attr("font-size", "10px")
+            .attr("x", function (d, i) {
+                // return i * (100 / weather.length);
+                return i*34+15;
+            })
+            .attr("y", function (d) {
+                return 160;
+            });
 
     // short user
     // var sroutes = routes_s.selectAll(".route_line")

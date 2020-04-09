@@ -1,29 +1,61 @@
+//保存一天的trip数据，map画轨迹也会用到
+
 sendspiralReq();
 function sendspiralReq() {
     $.ajax({
-        url: "http://localhost:3000/fromStation",
+        url: "http://localhost:3000/spiralLineData",
         dataType: 'json',
         crossDomain: false,
-        data: {},
+        //  data: { 
+        //      sstartyear: a.weekStartYear,
+        //      sstartmonth: a.weekStartMonth,
+        //      sstartday:a.weekStartDay,
+        //      sendyear:a.weekEndYear,
+        //      sendmonth:a.weekEndMonth,
+        //      sendday:a.weekEndDay
+        // },
+        data: {
+            sstartyear: a.getyear,
+            sstartmonth: a.getmonth,
+            sstartday:a.getday,
+            sendyear:a.endYear,
+            sendmonth:a.endMonth,
+            sendday:a.endDay
+        },
         async: true,
         type: "GET",
         contentType: "application/json",
         beforeSend: function () { },
-        success: function (data, textStatus) { handleSpiralTime(data); },
+        success: function (data, textStatus) { 
+            // console.log(a.getyear, a.getmonth, a.getday, a.endYear, a.endMonth, a.endDay);
+            // console.log(data);
+            handleSpiralTime(data);
+         },
         complete: function () { },
         error: function () { }
     });
 }
 
 function handleSpiralTime(data) {
+   // console.log('data'); //console.log(data);
+    var memberspiral=[];
+    var shortspiral = [];
+    data.forEach(function (d){
+        if (d.user_type == "Member") memberspiral.push({start_time:d.start_time});
+        else shortspiral.push({ start_time: d.start_time });
+    })
+    spiralData=[];
+    spiralData.push(memberspiral);
+    spiralData.push(shortspiral);
+    //dayTripInfo = data; console.log('dayTripInfo'); console.log(dayTripInfo);
     var nest = d3.nest().key(function (d) {
         return d.start_time;
     });
-    var spiralNest = nest.entries(data);
-    spiralNest.forEach(function (d) {
+    var spiralNest = nest.entries(memberspiral);
+    spiralNest.forEach(function (d,i) {
         d.values = d.values.length;
     });
-    console.log(spiralNest);
+    // console.log('spiralNest');console.log(spiralNest);
 
     // dateExtent 例：[[6:30],[22:30]]
     var dateExtent = d3.extent(spiralNest, function (d) {
@@ -84,7 +116,7 @@ function drawSpiral(data_10min) {
     var theta = function (r) {
         return numSpirals * Math.PI * r;
     };
-    var r = d3.min([width, height]) / 2;
+    var r = d3.min([width, height]) / 2-25;
     // start = 0,stop = 2.25
     var radius = d3.scale.linear()
         .domain([start, stop])
