@@ -6,8 +6,8 @@ var a;
 getInfo(dateBian);
 function getInfo(datebian) {
     // 获得几号
-    console.log('datebian'); console.log(datebian);
-    var daybian = datebian.getDate(); console.log('daybian'); console.log(daybian);
+    //console.log('datebian'); console.log(datebian);
+    var daybian = datebian.getDate(); //console.log('daybian'); console.log(daybian);
     var monthbian = datebian.getMonth();
     var yearbian = datebian.getFullYear();
     var enddate = new Date(yearbian, monthbian, daybian);
@@ -31,7 +31,7 @@ function getInfo(datebian) {
             break;
         case 2:
             weekstart.setDate(daybian - 1);
-            weekend.setDate(daybian + 6); console.log("weekend"); console.log(weekend);
+            weekend.setDate(daybian + 6); //console.log("weekend"); console.log(weekend);
         case 3:
             weekstart.setDate(daybian - 2);
             weekend.setDate(daybian + 5);
@@ -54,7 +54,7 @@ function getInfo(datebian) {
     // console.log(weekend);
     // console.log('datebian2!!!!!!!!!'); 
     //var getdate;
-    console.log("weekend"); console.log(weekend);
+    //console.log("weekend"); console.log(weekend);
     endday = enddate.getDate();
     endmonth = enddate.getMonth();
     endyear = enddate.getFullYear();
@@ -63,9 +63,9 @@ function getInfo(datebian) {
     weekstartyear = weekstart.getFullYear();
     weekendday = weekend.getDate();
     weekendmonth = weekend.getMonth();
-    weekendyear = weekend.getFullYear(); console.log("weekend"); console.log(weekend);
+    weekendyear = weekend.getFullYear(); //console.log("weekend"); console.log(weekend);
     if ((weekendmonth - weekstartmonth) > 1) weekendmonth = weekstartmonth + 1;
-     console.log("weekendmonth"); console.log(weekendmonth);
+     //console.log("weekendmonth"); console.log(weekendmonth);
     if (weekstart.getDay() != 1){
         weekstart.setDate(1 - weekstart.getDay() + weekstartday);
         weekstartday = weekstart.getDate();

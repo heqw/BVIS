@@ -33,15 +33,15 @@ Object.defineProperty(a, 'getdate', {
             // console.log('getdate 赋值后：' + getdate);
 
             lastDatebian = getdate; //shuchu(getdate);
-            console.log('value changed! set:' + getdate);
+           // console.log('value changed! set:' + getdate);
             getInfo(getdate);
-            console.log("getdate");console.log(getdate);
+            //console.log("getdate");console.log(getdate);
         }
     }
 });
 
 // 验证时间不一样时是否执行了getInfo（）
 a.getdate = date; // set:2
-console.log(a);
-console.log('a.getdate now:' + a.getdate);
-console.log('a.weekend now:' + a.weekEnd);
+// console.log(a);
+// console.log('a.getdate now:' + a.getdate);
+// console.log('a.weekend now:' + a.weekEnd);

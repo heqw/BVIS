@@ -1,4 +1,5 @@
 sendTimeReq();
+
 function sendTimeReq() {
     $.ajax({
 
@@ -16,21 +17,22 @@ function sendTimeReq() {
         async: true,
         type: "GET",
         contentType: "application/json",
-        beforeSend: function () { },
-        success: function (data, textStatus) {
-            console.log("data"); console.log(data);
-            data.forEach(function (d) {
+        beforeSend: function() {},
+        success: function(data, textStatus) {
+            // console.log("data");
+            // console.log(data);
+            data.forEach(function(d) {
                 d.week = new Date(d.start_time).getUTCDay();
             });
             handleData(data);
         },
-        complete: function () { },
-        error: function () { }
+        complete: function() {},
+        error: function() {}
     });
 }
 
 function handleData(data) {
-    var nest = d3.nest().key(function (d) {
+    var nest = d3.nest().key(function(d) {
         if (d.week == 0) d.week = 7;
         return d.week
     })
@@ -40,7 +42,7 @@ function handleData(data) {
     var i = 0;
     var memberData = [];
     var shortData = [];
-    drawData.forEach(function (d) {
+    drawData.forEach(function(d) {
         var memberSum = 0;
         var shortSum = 0;
         for (var i = 0; i < d.values.length; i++) {
@@ -61,9 +63,9 @@ function handleData(data) {
     drawtime(userData);
     // drawtime(memberData);
     // drawtime(shortData);
-    // console.log(userData);
-    console.log(memberData);
-    console.log(shortData);
+    console.log(userData);
+    // console.log(memberData);
+    // console.log(shortData);
 }
 
 function drawtime(data) {
@@ -96,8 +98,8 @@ function drawtime(data) {
     var svg = d3.select("#timeLineView").append("svg")
         .attr("id", "time_line_svg")
         .attr("width", width)
-        .attr("height", height+50)
-        .attr("transform", "translate(" + margin.left + "," + margin.top  + ")");
+        .attr("height", height + 50)
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     svg.append("g")
         .attr("class", "x axis")
@@ -110,9 +112,9 @@ function drawtime(data) {
         .call(y_axis);
 
 
-    var line = d3.svg.line().x(function (d, i) {
+    var line = d3.svg.line().x(function(d, i) {
         return x_scale(parseInt(d.key));
-    }).y(function (d) {
+    }).y(function(d) {
         return y_scale(d.daySum);
 
     }).interpolate("basis");
@@ -126,35 +128,35 @@ function drawtime(data) {
         .data(data)
         .enter()
         .append("g")
-        .attr("class", function (d) { return "routes_line route_" + parseInt(d.key) });
+        .attr("class", function(d) { return "routes_line route_" + parseInt(d.key) });
 
     routes.append("path")
         .attr('fill', "none")
         .attr('opacity', 0.6)
-        .attr('stroke', function (d, i) {
+        .attr('stroke', function(d, i) {
             return color[i];
         })
         .attr("stroke-width", 2)
-        .attr("d", function (d, i) {
+        .attr("d", function(d, i) {
             return line(data[i])
         })
-    var weather=['rain','rain','sunny','frog','rain','rain','rain'];
-        svg.selectAll(".text")
-            .data(weather)
-            .enter()
-            .append("text")
-            .text(function (d) {
-                return d;
-            })
-            .attr("fill", "black")
-            .attr("font-size", "10px")
-            .attr("x", function (d, i) {
-                // return i * (100 / weather.length);
-                return i*34+15;
-            })
-            .attr("y", function (d) {
-                return 160;
-            });
+    var weather = ['rain', 'rain', 'sunny', 'frog', 'rain', 'rain', 'rain'];
+    svg.selectAll(".text")
+        .data(weather)
+        .enter()
+        .append("text")
+        .text(function(d) {
+            return d;
+        })
+        .attr("fill", "black")
+        .attr("font-size", "10px")
+        .attr("x", function(d, i) {
+            // return i * (100 / weather.length);
+            return i * 34 + 15;
+        })
+        .attr("y", function(d) {
+            return 160;
+        });
 
     // short user
     // var sroutes = routes_s.selectAll(".route_line")

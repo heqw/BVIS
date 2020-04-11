@@ -32,16 +32,55 @@
             display: flex;
             flex-wrap: wrap;
         }
-
-
+        
         #map {
             position: absolute;
             top: 8%;
             left: 22%;
             width: 56%;
-            height: 85%;
+            height: 62%;
         }
-
+        
+        #bar {
+            position: absolute;
+            top: 70%;
+            left: 22%;
+            width: 56%;
+            height: 29%;
+            bottom: 1px;
+        }
+        
+        #barView {
+            /* position: absolute; */
+            height: 100%;
+            width: 100%;
+        }
+        
+        .tooltip {
+            position: absolute;
+            width: 120;
+            height: auto;
+            font-family: simsun;
+            font-size: 14px;
+            text-align: center;
+            border-style: solid;
+            border-width: 1px;
+            background-color: white;
+            border-radius: 5px;
+        }
+        
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: rgb(0, 0, 0);
+            stroke-width: 1px;
+        }
+        
+        .axis text {
+            fill: rgb(0, 0, 0);
+            font-size: 10px;
+        }
+        
         #spiralLine {
             position: absolute;
             top: 8%;
@@ -49,45 +88,41 @@
             width: 22%;
             height: 50%;
         }
-
+        
         #headTitle {
             /* font-size: 2px; */
             position: absolute;
             left: 30%;
-            top: 1%;
+            /* top: 1%; */
         }
-
-
-        #calendar{
+        
+        #calendar {
             position: absolute;
             top: 59%;
             left: 78%;
             width: 22%;
             height: 20%;
         }
-
-
-
+        
         .leftName {
             left: 1%;
             position: absolute;
             font-size: 12px;
         }
-
+        
         .rightName {
             /* right: 1px; */
             position: absolute;
             font-size: 12px;
         }
-
-
         /* .input-append date form_datetime{
             
         } */
-
-
-        h1{font-size : 25px;}
-
+        
+        h1 {
+            font-size: 25px;
+        }
+        
         #wholeView {
             /* position: fixed; */
             width: 100%;
@@ -118,6 +153,11 @@
             <div id="mapView"></div>
         </div>
 
+        <div id="bar">
+            <!-- <div class="barName">BAR</div> -->
+            <div id="barView"></div>
+        </div>
+
         <div id="spiralLine">
             <div class="rightName">一天骑行次数分布</div>
             <div id="spiralLineView"></div>
@@ -142,5 +182,6 @@
 <script src="../public/js/main.js"></script>
 <script src="../public/js/timeLine.js"></script>
 <script src="../public/js/wordCloud.js"></script>
+<script src="../public/js/bar.js"></script>
 
 </html>

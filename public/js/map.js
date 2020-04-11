@@ -9,17 +9,18 @@ var map = new mapboxgl.Map({
     //A zoom level determines how much of the world is visible on a map，缩放级别
     zoom: 11.7,
     //Default map center in longitude and latitude.经度 纬度
-    center: [-122.319407, 47.630748],
+    center: [-122.319407, 47.623748],
     //pitch in degrees倾斜度
-    //pitch: 50
+    pitch: 40
 });
 //  var daytripInfo;
 //console.log(stationInfo);
 
 // var dayTripInfo;
 DrawStation();
+
 function DrawStation() {
-// var daytripInfo;
+    // var daytripInfo;
 
     $.ajax({
         url: "http://localhost:3000/spiralLineData",
@@ -37,19 +38,20 @@ function DrawStation() {
         async: true,
         type: "GET",
         contentType: "application/json",
-        beforeSend: function () { },
-        success: function (Info, textStatus) {
+        beforeSend: function() {},
+        success: function(Info, textStatus) {
             // var daytripInfo = Info; console.log(daytripInfo);
-            console.log(Info);
+            // console.log(Info);
             senddaytripInfo(Info);
         },
-        complete: function () { },
-        error: function () { }
+        complete: function() {},
+        error: function() {}
     });
 
     //console.log(daytripInfo);
 }
-function senddaytripInfo(In){
+
+function senddaytripInfo(In) {
 
     $.ajax({
         url: "http://localhost:3000/stationData",
@@ -59,21 +61,21 @@ function senddaytripInfo(In){
         async: true,
         type: "GET",
         contentType: "application/json",
-        beforeSend: function () { },
+        beforeSend: function() {},
         //success: function(StrContent)里的这个参数，
         //任意命名的，在这个函数有用到。参数值是在Ajax提交成功后所返回的内容
-        success: function (mapInfo, textStatus) {
+        success: function(mapInfo, textStatus) {
             //stationInfo=mapInfo;
             drawMap(mapInfo, In); //console.log(daytripInfo);
         },
-        complete: function () { },
-        error: function () { console.log("maperror") }
+        complete: function() {},
+        error: function() { console.log("maperror") }
     });
     //console.log(stationFeatures); console.log(typeof (stationFeatures));
 
 }
 
-function drawMap(station,dayTripInfo) {
+function drawMap(station, dayTripInfo) {
     //console.log(station);
     //console.log(typeof(station));
     // stationData = station;
@@ -88,9 +90,9 @@ function drawMap(station,dayTripInfo) {
     //给每一个单车数据添加feature
     var stationFeatures = [];
 
-    station.forEach(function (d) {
+    station.forEach(function(d) {
         stationFeatures.push({
-            "type": "Feature",//则该对象必须有属性 geometry，其值为一个几何对象；此外还有一个属性 properties，可以是任意 JSON 或 null
+            "type": "Feature", //则该对象必须有属性 geometry，其值为一个几何对象；此外还有一个属性 properties，可以是任意 JSON 或 null
             //properties里面可以封装各种属性，例如名称、标识颜色
             "properties": {
                 "station_id": d.station_id,
@@ -148,22 +150,22 @@ function drawMap(station,dayTripInfo) {
 
 
     // trips计算sum
-    dayTripInfo.forEach(function (d) {
+    dayTripInfo.forEach(function(d) {
         var sum = 1;
         od.push({ odFrom: d.from_station_id, odTo: d.to_station_id, odSum: sum });
     });
     var nest = d3.nest()
-        .key(function (d) { return d.odFrom; })
-        .key(function (d) { return d.odTo; });
+        .key(function(d) { return d.odFrom; })
+        .key(function(d) { return d.odTo; });
     var odnest = nest.entries(od);
     // console.log('odnest:');
     // console.log(odnest);
 
-    odnest.forEach(function (d) {
+    odnest.forEach(function(d) {
         var i = 0;
         for (i = 0; i < d.values.length; i++)
             trips.push({ tripsFrom: d.key, tripsTo: d.values[i].key, tripsSum: d.values[i].values.length });
-    }); console.log(trips);
+    }); //console.log(trips);
 
 
 
@@ -174,7 +176,7 @@ function drawMap(station,dayTripInfo) {
     // }); console.log(trips);
 
 
-    trips.forEach(function (d) {
+    trips.forEach(function(d) {
         //console.log(stationLongLat.length);
         for (var i = 0; i < stationLongLat.length; i++) {
             // console.log("ssss");
@@ -195,7 +197,7 @@ function drawMap(station,dayTripInfo) {
 
     //data_point是车站的集合？画站点位置用
     var data_point = {
-        "type": "FeatureCollection",//则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
+        "type": "FeatureCollection", //则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
         "features": stationFeatures
     }; //console.log(stationFeatures);
 
@@ -206,7 +208,7 @@ function drawMap(station,dayTripInfo) {
     //           2-3           4-7        8-11        12-15       16-19
     //             深卡其布    黄色         纯红        耐火砖       栗色
     var colors = ["#BDB76B", "#EDC951", "#FF0000", "#B22222", "#800000"];
-    var buildLines = function () {
+    var buildLines = function() {
         var features = [];
         var curveness = 0.3;
         for (var i = 0; i < trips.length; i++) {
@@ -218,7 +220,7 @@ function drawMap(station,dayTripInfo) {
                 var control = [
                     (startLong + endLong) / 2 - (startLat - endLat) * curveness,
                     (startLat + endLat) / 2 - (startLong - endLong) * curveness
-                ];//console.log(control);
+                ]; //console.log(control);
 
                 var t = 0;
                 var points = [];
@@ -246,7 +248,7 @@ function drawMap(station,dayTripInfo) {
     };
 
     // 画贝塞尔的运动点
-    var buildPoints = function (time) {
+    var buildPoints = function(time) {
         var features = [];
         var curveness = 0.3;
         for (var i = 0; i < trips.length; i++) {
@@ -258,7 +260,7 @@ function drawMap(station,dayTripInfo) {
                 var control = [
                     (startLong + endLong) / 2 - (startLat - endLat) * curveness,
                     (startLat + endLat) / 2 - (startLong - endLong) * curveness
-                ];//console.log(control);
+                ]; //console.log(control);
 
                 // 为了绘制彗星尾迹，需要同时画出count个半径递增的圆点
                 var count = 200;
@@ -292,13 +294,13 @@ function drawMap(station,dayTripInfo) {
 
     //画贝塞尔曲线的source 
     var data_line = {
-        "type": "FeatureCollection",//则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
+        "type": "FeatureCollection", //则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
         "features": buildLines()
-    };//console.log(data_line);
+    }; //console.log(data_line);
 
 
     // 加载站点
-    map.on('load', function () {
+    map.on('load', function() {
         //map.addSource(id,source)id为数据源id，这些数据源名叫id;source数据源对象,描述数据？
         map.addSource("station_source", {
             "type": "geojson",
@@ -343,7 +345,8 @@ function drawMap(station,dayTripInfo) {
 
         // 加载贝塞尔曲线
         map.addSource("chart-lines", {
-            "type": "geojson",           /* geojson类型资源 */
+            "type": "geojson",
+            /* geojson类型资源 */
             "data": data_line
         });
 
@@ -367,21 +370,26 @@ function drawMap(station,dayTripInfo) {
 
         // 加载贝塞尔曲线运动点
         map.addSource("chart-points", {
-            "type": "geojson",           /* geojson类型资源 */
-            "data": {                    /* geojson数据 */
+            "type": "geojson",
+            /* geojson类型资源 */
+            "data": { /* geojson数据 */
                 "type": "FeatureCollection",
                 "features": buildPoints(0.1)
             }
         });
         map.addLayer({
             "id": "chart-points",
-            "type": "circle",          /* circle类型表示一个圆，一般比较小 */
+            "type": "circle",
+            /* circle类型表示一个圆，一般比较小 */
             "source": "chart-points",
             "paint": {
                 "circle-radius": ["get", "radius"],
-                "circle-color": ["get", "color"],  /* 圆的颜色 */
-                "circle-stroke-width": 1,  /* 边框宽度 */
-                "circle-stroke-color": ["get", "color"],  /* 边框的颜色 */
+                "circle-color": ["get", "color"],
+                /* 圆的颜色 */
+                "circle-stroke-width": 1,
+                /* 边框宽度 */
+                "circle-stroke-color": ["get", "color"],
+                /* 边框的颜色 */
                 "circle-opacity": 0.5,
                 "circle-pitch-alignment": "map"
             }
@@ -398,7 +406,7 @@ function drawMap(station,dayTripInfo) {
             closeOnClick: false
         });
 
-        map.on('mouseenter', 'station', function (e) {
+        map.on('mouseenter', 'station', function(e) {
             // Change the cursor style as a UI indicator.
             map.getCanvas().style.cursor = 'pointer';
 
@@ -422,7 +430,7 @@ function drawMap(station,dayTripInfo) {
                 .addTo(map);
         });
 
-        map.on('mouseleave', 'station', function () {
+        map.on('mouseleave', 'station', function() {
             map.getCanvas().style.cursor = '';
             popup.remove();
         });
@@ -543,19 +551,19 @@ function drawMap(station,dayTripInfo) {
 // });
 
 //map.addLayer({
-    // 'id': 'eggwalkathon_card',
-    // 'type': 'symbol',
-    // 'source': 'eggwalkathon',
-    // "layout": {
-    //     "visibility": "visible",
-    //     "icon-image": "embassy-15",
-    //     "icon-size": 1.4,
-    //     "icon-allow-overlap": true
-    // },
-    // "paint": {
-    //     "circle-radius": 3,
-    //     "circle-color": "#000000"
-    // }
-    // ,
-    // "filter": ["==", "type", Point]
+// 'id': 'eggwalkathon_card',
+// 'type': 'symbol',
+// 'source': 'eggwalkathon',
+// "layout": {
+//     "visibility": "visible",
+//     "icon-image": "embassy-15",
+//     "icon-size": 1.4,
+//     "icon-allow-overlap": true
+// },
+// "paint": {
+//     "circle-radius": 3,
+//     "circle-color": "#000000"
+// }
+// ,
+// "filter": ["==", "type", Point]
 //});

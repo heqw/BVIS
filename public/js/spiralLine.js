@@ -1,6 +1,7 @@
 //保存一天的trip数据，map画轨迹也会用到
 
 sendspiralReq();
+
 function sendspiralReq() {
     $.ajax({
         url: "http://localhost:3000/spiralLineData",
@@ -17,48 +18,49 @@ function sendspiralReq() {
         data: {
             sstartyear: a.getyear,
             sstartmonth: a.getmonth,
-            sstartday:a.getday,
-            sendyear:a.endYear,
-            sendmonth:a.endMonth,
-            sendday:a.endDay
+            sstartday: a.getday,
+            sendyear: a.endYear,
+            sendmonth: a.endMonth,
+            sendday: a.endDay
         },
         async: true,
         type: "GET",
         contentType: "application/json",
-        beforeSend: function () { },
-        success: function (data, textStatus) { 
+        beforeSend: function() {},
+        success: function(data, textStatus) {
             // console.log(a.getyear, a.getmonth, a.getday, a.endYear, a.endMonth, a.endDay);
             // console.log(data);
             handleSpiralTime(data);
-         },
-        complete: function () { },
-        error: function () { }
+        },
+        complete: function() {},
+        error: function() {}
     });
 }
 
 function handleSpiralTime(data) {
-   // console.log('data'); //console.log(data);
-    var memberspiral=[];
+    // console.log('data'); //console.log(data);
+    var memberspiral = [];
     var shortspiral = [];
-    data.forEach(function (d){
-        if (d.user_type == "Member") memberspiral.push({start_time:d.start_time});
+    data.forEach(function(d) {
+        if (d.user_type == "Member") memberspiral.push({ start_time: d.start_time });
         else shortspiral.push({ start_time: d.start_time });
     })
-    spiralData=[];
+    spiralData = [];
     spiralData.push(memberspiral);
     spiralData.push(shortspiral);
     //dayTripInfo = data; console.log('dayTripInfo'); console.log(dayTripInfo);
-    var nest = d3.nest().key(function (d) {
+    var nest = d3.nest().key(function(d) {
         return d.start_time;
     });
     var spiralNest = nest.entries(memberspiral);
-    spiralNest.forEach(function (d,i) {
+    // 在某个时间点所有单车的使用次数
+    spiralNest.forEach(function(d, i) {
         d.values = d.values.length;
     });
     // console.log('spiralNest');console.log(spiralNest);
 
     // dateExtent 例：[[6:30],[22:30]]
-    var dateExtent = d3.extent(spiralNest, function (d) {
+    var dateExtent = d3.extent(spiralNest, function(d) {
         // getDate() setMinute()这些函数的对象是Date对象，所以要将UTC转为date,中国时间
         return new Date(d.key);
     }); //console.log(dateExtent);
@@ -74,7 +76,7 @@ function handleSpiralTime(data) {
     for (var i = dateExtent[0].getTime(); i <= dateExtent[1].getTime(); i += 1000 * 60 * 10) {
         var sum = 0;
         // 如果nest后的数组(test)的start_time在刻度开始时间和刻度结束时间内，对刻度高度和刻度个数进行操作
-        spiralNest.forEach(function (d) {
+        spiralNest.forEach(function(d) {
             if (new Date(d.key).getTime() >= i && new Date(d.key).getTime() < i + 1000 * 60 * 10) {
                 // 计算xx时x0分的值，也就是刻度高度
                 sum += d.values;
@@ -82,26 +84,26 @@ function handleSpiralTime(data) {
         });
         // 存储时分向上取整处理后的时间和values值  
         //console.log(new Date(i).setHours(new Date(i).getHours()-8));
-        var oldDate = new Date(i); 
-        var newDate = oldDate; 
+        var oldDate = new Date(i);
+        var newDate = oldDate;
 
         var gotDate = oldDate.getDate();
         // changeDate.setHours(new Date(i).getHours() - 8)
         var gotHours = oldDate.getHours();
-        if (gotHours > 15) gotHours-=8;
-       else if (gotHours <15) {
+        if (gotHours > 15) gotHours -= 8;
+        else if (gotHours < 15) {
             gotHours += 16;
-            newDate.setDate(gotDate -1);
-        } 
+            newDate.setDate(gotDate - 1);
+        }
         // console.log("gotHours:"); console.log(gotHours);
         //console.log("newDate:");console.log(newDate);
         newDate.setHours(gotHours);
         //console.log("lastDate:"); console.log(newDate);
         data_10min.push({ date: newDate, value: sum });
     }
-    
+
     drawSpiral(data_10min);
-   
+
     // console.log("data_10min:");
     // console.log( data_10min);
 }
@@ -113,14 +115,14 @@ function drawSpiral(data_10min) {
     var start = 0,
         stop = 2.25,
         numSpirals = 3;
-    var theta = function (r) {
+    var theta = function(r) {
         return numSpirals * Math.PI * r;
     };
-    var r = d3.min([width, height]) / 2-25;
+    var r = d3.min([width, height]) / 2 - 25;
     // start = 0,stop = 2.25
     var radius = d3.scale.linear()
         .domain([start, stop])
-        .range([20, r+3]);
+        .range([20, r + 3]);
 
 
     // 设置svg画布
@@ -165,14 +167,14 @@ function drawSpiral(data_10min) {
     // d3.time.scale()针对日期和时间值的一个比例尺方法，可以对日期刻度作特殊处理。
     var timeScale = d3.time.scale()
         // 输入间隔十分钟的数组
-        .domain(d3.extent(data_10min, function (d) {
+        .domain(d3.extent(data_10min, function(d) {
             return d.date;
         }))
         .range([0, spiralLength]);
 
     // 矩形的比例尺
     var yScale = d3.scale.linear()
-        .domain([0, d3.max(data_10min, function (d) {
+        .domain([0, d3.max(data_10min, function(d) {
             return d.value;
         })])
         // r为宽高最小值的一半 numSpirals=3
@@ -181,34 +183,36 @@ function drawSpiral(data_10min) {
         .data(data_10min)
         .enter()
         .append("rect")
-        .attr("x", function (d, i) {
+        .attr("x", function(d, i) {
 
             var linePer = timeScale(d.date),
                 //使用 getPointAtLength 获取当前坐标
                 posOnLine = path.node().getPointAtLength(linePer),
                 angleOnLine = path.node().getPointAtLength(linePer - barWidth);
 
-            d.linePer = linePer; d.x = posOnLine.x; d.y = posOnLine.y;
+            d.linePer = linePer;
+            d.x = posOnLine.x;
+            d.y = posOnLine.y;
             // Math.atan2() 返回从原点(0,0)到(x,y)点的线段与x轴正方向之间的平面角度(弧度值),也就是Math.atan2(y,x)
             // *180/Math.PI  转换为角度
             // 为什么要 -90？？
             d.a = (Math.atan2(angleOnLine.y, angleOnLine.x) * 180 / Math.PI) - 90;
             return d.x;
         })
-        .attr("y", function (d) {
+        .attr("y", function(d) {
             return d.y;
         })
-        .attr("width", function (d) {
+        .attr("width", function(d) {
             return barWidth;
         })
-        .attr("height", function (d) {
+        .attr("height", function(d) {
             return yScale(d.value);
         })
         .style({
             "fill": "#9d2933",
             "stroke": "none"
         })
-        .attr("transform", function (d) {
+        .attr("transform", function(d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")";
         })
 
@@ -225,7 +229,7 @@ function drawSpiral(data_10min) {
         .style("font", "10px arial")
         .append("textPath")
         // ？？？
-        .filter(function (d) {
+        .filter(function(d) {
             var Format = d3.time.format("%H");
             var sd = Format(d.date);
             if (!firstInMonth[sd]) {
@@ -234,12 +238,12 @@ function drawSpiral(data_10min) {
             }
             return false;
         })
-        .text(function (d) {
+        .text(function(d) {
             return tF(d.date);
         })
         .attr("xlink:href", "#spiral")
         .style("fill", "#2F4F4F")
-        .attr("startOffset", function (d) {
+        .attr("startOffset", function(d) {
             return ((d.linePer / spiralLength) * 100) + "%";
         });
 }
