@@ -1,17 +1,22 @@
 // 2014 - 10 - 12T16: 00: 00.000Z 输出的是UTC时间？？？
-var dateBian = new Date("2014/11/1");//console.log(typeof(datebian));
+var dateBian = new Date("2014/11/1"); //console.log(typeof(datebian));
 //datebian.setDate(10);
 //console.log('datebian'); console.log(datebian);
 var a;
 getInfo(dateBian);
+
 function getInfo(datebian) {
     // 获得几号
     //console.log('datebian'); console.log(datebian);
     var daybian = datebian.getDate(); //console.log('daybian'); console.log(daybian);
     var monthbian = datebian.getMonth();
     var yearbian = datebian.getFullYear();
+    // end开头的变量是以一天为统计单位的结束日期
     var enddate = new Date(yearbian, monthbian, daybian);
+    // End开头的变量是以一个月为统计单位的结束日期，即下月第一天 YYYY-MM-1
+    var Enddate = new Date(yearbian, monthbian, 1);
     enddate.setDate(daybian + 1);
+    Enddate.setMonth(monthbian + 1);
     // 获得星期几
     var weekbian = datebian.getDay();
     // 星期一开始是1号,获得星期一的号数
@@ -25,7 +30,7 @@ function getInfo(datebian) {
             weekstart.setDate(daybian - 6);
             weekend.setDate(daybian + 1);
             break;
-        // 星期一，weekstart不变，weekend加6
+            // 星期一，weekstart不变，weekend加6
         case 1:
             weekend.setDate(daybian + 7);
             break;
@@ -55,9 +60,14 @@ function getInfo(datebian) {
     // console.log('datebian2!!!!!!!!!'); 
     //var getdate;
     //console.log("weekend"); console.log(weekend);
+
+    // end开头的变量是以一天为统计单位的结束日期
     endday = enddate.getDate();
     endmonth = enddate.getMonth();
     endyear = enddate.getFullYear();
+    EndMonth = Enddate.getMonth();
+    EndYear = Enddate.getFullYear();
+
     weekstartday = weekstart.getDate();
     weekstartmonth = weekstart.getMonth();
     weekstartyear = weekstart.getFullYear();
@@ -65,27 +75,42 @@ function getInfo(datebian) {
     weekendmonth = weekend.getMonth();
     weekendyear = weekend.getFullYear(); //console.log("weekend"); console.log(weekend);
     if ((weekendmonth - weekstartmonth) > 1) weekendmonth = weekstartmonth + 1;
-     //console.log("weekendmonth"); console.log(weekendmonth);
-    if (weekstart.getDay() != 1){
+    //console.log("weekendmonth"); console.log(weekendmonth);
+    if (weekstart.getDay() != 1) {
         weekstart.setDate(1 - weekstart.getDay() + weekstartday);
         weekstartday = weekstart.getDate();
-    } 
+    }
     if (weekend.getDay() != 1) {
         weekend.setDate(7 + weekstartday);
         weekendday = weekend.getDate();
-    } monthbian
+    }
+    monthbian
     if (weekstartmonth != monthbian) weekstartmonth = monthbian;
     if ((weekendmonth - weekstartmonth) > 1) weekendmonth = weekstartmonth + 1;
-    
-    a = {
-        getdate: datebian, getday: daybian,
-        getmonth: monthbian, getyear: yearbian,
-        endDay: endday, endMonth: endmonth, endYear: endyear,
 
-        getweek: weekbian, weekStart: weekstart,
-        weekEnd: weekend, weekStartDay: weekstartday,
-        weekStartMonth: weekstartmonth, weekStartYear: weekstartyear,
-        weekEndDay: weekendday, weekEndMonth: weekendmonth,
+    a = {
+        getdate: datebian,
+
+        getday: daybian,
+        getmonth: monthbian,
+        getyear: yearbian,
+
+        endDay: endday,
+        endMonth: endmonth,
+        endYear: endyear,
+
+        EndMonth: EndMonth,
+        EndYear: EndYear,
+
+        // timeLine
+        getweek: weekbian,
+        weekStart: weekstart,
+        weekEnd: weekend,
+        weekStartDay: weekstartday,
+        weekStartMonth: weekstartmonth,
+        weekStartYear: weekstartyear,
+        weekEndDay: weekendday,
+        weekEndMonth: weekendmonth,
         weekEndYear: weekendyear
     };
 
@@ -93,6 +118,7 @@ function getInfo(datebian) {
 // console.log(weekstart);
 // console.log(weekend);
 var lastDatebian = a.getdate;
+// console.log(new Date("2020/2/30"));
 //console.log('date in bianliang.js is'+ lastDatebian);
 
 // Object.defineProperty(a, 'getdate', {

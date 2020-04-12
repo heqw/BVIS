@@ -56,6 +56,21 @@
             width: 100%;
         }
         
+        #weather {
+            position: absolute;
+            top: 58%;
+            left: 78%;
+            width: 22%;
+            height: 40%;
+            /* bottom: 1px; */
+        }
+        
+        #weatherView {
+            /* position: absolute; */
+            height: 100%;
+            width: 100%;
+        }
+        
         .tooltip {
             position: absolute;
             width: 120;
@@ -98,9 +113,9 @@
         
         #calendar {
             position: absolute;
-            top: 59%;
-            left: 78%;
-            width: 22%;
+            top: 2%;
+            left: 80%;
+            width: 20%;
             height: 20%;
         }
         
@@ -162,6 +177,12 @@
             <div class="rightName">一天骑行次数分布</div>
             <div id="spiralLineView"></div>
         </div>
+
+        <div id="weather">
+            <div class="rightName">天气</div>
+            <div id="weatherView"></div>
+        </div>
+
         <div id="calendar">
             <div class="input-append date form_datetime">
                 <input size="16" type="text" value="" name="startTime" readonly>
@@ -183,5 +204,6 @@
 <script src="../public/js/timeLine.js"></script>
 <script src="../public/js/wordCloud.js"></script>
 <script src="../public/js/bar.js"></script>
+<script src="../public/js/weather.js"></script>
 
 </html>

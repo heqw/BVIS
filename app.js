@@ -6,7 +6,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var ejs = require('ejs');//html模板引擎设置
+var ejs = require('ejs'); //html模板引擎设置
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -17,17 +17,18 @@ var wordCloudrouter = require('./routes/wordCloudRoute');
 var timeLinerouter = require('./routes/timeLineRoute');
 var spiralLinerouter = require('./routes/spiralLineRoute');
 var getInforouter = require('./routes/getInfoRoute');
+var weatherrouter = require('./routes/weatherRoute');
 
 var app = express();
 
-app.all('*', function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Authorization,Content-Type,Depth, User-Agent,X-File-Size, X-Requested-With, X-Requested-By, If-Modified-Since, X-File-Name, X-File-Type, Cache-Control, Origin");
-  res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,PATCH,OPTIONS");
-  res.header("X-Powered-By", ' 3.2.1');
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header("Content-Type", "application/json;charset=utf-8");
-  next();
+app.all('*', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Authorization,Content-Type,Depth, User-Agent,X-File-Size, X-Requested-With, X-Requested-By, If-Modified-Since, X-File-Name, X-File-Type, Cache-Control, Origin");
+    res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,PATCH,OPTIONS");
+    res.header("X-Powered-By", ' 3.2.1');
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header("Content-Type", "application/json;charset=utf-8");
+    next();
 });
 
 
@@ -41,12 +42,14 @@ app.engine('html', ejs.__express);
 //没有指定文件模板格式时，默认使用的引擎插件
 app.set('view engine', 'html');
 //first连接
-app.use('/',fr);
+app.use('/', fr);
 app.use('/', maprouter);
 app.use('/', wordCloudrouter);
 app.use('/', timeLinerouter);
 app.use('/', getInforouter);
 app.use('/', spiralLinerouter);
+app.use('/', weatherrouter);
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -59,18 +62,18 @@ app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+    next(createError(404));
 });
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 module.exports = app;
 
