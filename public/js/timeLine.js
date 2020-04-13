@@ -63,7 +63,7 @@ function handleData(data) {
     drawtime(userData);
     // drawtime(memberData);
     // drawtime(shortData);
-    console.log(userData);
+    //console.log(userData);
     // console.log(memberData);
     // console.log(shortData);
 }

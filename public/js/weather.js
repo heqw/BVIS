@@ -17,8 +17,8 @@ function sendWeatherReq() {
         contentType: "application/json",
         beforeSend: function() {},
         success: function(data, textStatus) {
-            console.log("data");
-            console.log(data);
+            // console.log("data");
+            // console.log(data);
             // data.forEach(function(d) {
             //     d.week = new Date(d.start_time).getUTCDay();
             // });
@@ -311,92 +311,145 @@ function handleWeaSta(data, Data) {
     // console.log("CountNest排序后");
     // console.log(CountNest);
 
-    // 由于nest结构读值不方便，所以变换为普通的数组,并且只录入前20的车站
+    // 由于nest结构读值不方便，所以变换为普通的数组,并且只录入前15的车站
     var viewData = [];
-    var count20 = 0;
+    var count15 = 0;
     CountNest.forEach(function(d) {
-        count20++;
-        if (count20 <= 20) {
+        count15++;
+        if (count15 <= 15) {
             for (i = 0; i < d.values.length; i++) {
                 viewData.push({ ID: d.key, sort: d.sort, Index: d.values[i].Index, sum: d.values[i].sum });
             }
         }
     })
     drawWeather(viewData);
-    // console.log("viewData");
-    // console.log(viewData);
+    console.log("viewData");
+    console.log(viewData);
 }
+
+
 
 function drawWeather(data) {
     var calendar = $("#weatherView"),
         width = calendar.width(),
         height = calendar.height(),
-        gridSize = width / 22,
-        showindex = [];
-
-    var colorRange = d3.range(5).map(function(i) { return "q" + i + "-6"; });
+        gridSize = width / 20,
+        showID = [];
+    // showindex1 = ["Sunny", "Light", "Moderate", "Heavy", "Torrential",
+    //     " ", "Strong", "Moderate", "Fresh", "Strong",
+    //     "0℃-", "10℃-", " "
+    // ];
+    // showindex2 = [" ", "Rain", "Rain", "Rain", " Rain",
+    //     "calm", "Breeze", " Gale", "Gale", "Gale",
+    //     "10℃", "20℃", ">20℃"
+    // ];
+    showindex = ["晴", "小雨", "中雨", "大雨", "暴雨", "<6级", "6级", "7级", "8级", "9级", "0-10度", "10-20", ">20"]
+    var colorRange = d3.range(6).map(function(i) { return "q" + i + "-6"; });
     // d3.scale.threshold - 构建一个临界值比例尺（值域离散）
     var threshold = d3.scale.threshold()
-        .domain([0, 20])
+        .domain([0, 5, 10, 15, 20])
         .range(colorRange);
 
-    for (var i = 0; i <= 12; i++) {
-        showindex.push(i);
-    }
+    var findID = 0;
+    data.forEach(function(d) {
+            if (d.sort == findID) {
+                showID.push(d.ID);
+                findID++;
+            }
+        })
+        //console.log(showID);
 
     var svg = d3.select("#weatherView")
         .append("svg")
         .attr("id", "weahter_svg")
         .attr("width", width)
         .attr("height", height);
-    // 日期标签
-    var index_label = svg.append("g");
+    // // 系数标签（x轴）一行显示不完，拆成两行
+    // var indexLabel1 = svg.append("g");
+    // var indexLabel2 = svg.append("g");
+    var indexLabel = svg.append("g");
+    // 索引标签（y轴）
+    var sortLabel = svg.append("g");
     // 画视图的？
-    var calender_g = svg.append("g")
+    var weather_g = svg.append("g")
         .attr("transform", "translate(" + gridSize + ",0)");
     // 颜色标签
     var legend_g = svg.append("g")
-        .attr("transform", "translate(" + gridSize + "," + (height - 15) + ")");
+        .attr("transform", "translate(30,340)")
 
-    // 添加横向的那个号数标签
-    var days_Labels = index_label.selectAll(".index_Label")
+    var index_Labels = indexLabel.selectAll(".indexLabel")
         .data(showindex)
         .enter()
         .append("text")
-        .attr("class", "index_label")
+        .attr("class", "indexLabel")
         .attr("id", function(d, i) {
-            return "index_" + d;
+            return "index" + d;
         })
         .text(function(d) { return d; })
-        .attr("x", function(d, i) { return (i + 1.5) * gridSize; })
+        .attr("x", function(d, i) { return (i + 1.8) * (gridSize + 5); })
         .attr("y", 30)
         // .on("click", function(d, i) {
         //     d3.select("#section_date").text("2016/1/" + d);
         //     section_id_date(section_id, new Date(2016, 0, d, 0, 0, 0));
         // })
         .style({
-            "font-size": "8",
+            "font-size": "8px",
+            // 深灰色
             "fill": "#696969",
             "text-anchor": "middle"
         });
 
-    var calendar_rects = calender_g.selectAll(".hour")
+    // 添加竖向的那个ID标签
+    var sortLabels = sortLabel.selectAll(".sortLabel")
+        .data(showID)
+        .enter()
+        .append("text")
+        .attr("class", "sortLabel")
+        .attr("id", function(d, i) {
+            return "sort" + d;
+        })
+        .text(function(d) { return d; })
+        // 2.2影响标签的起始位置，*后面应该是影响两个标签的间距
+        .attr("y", function(d, i) { return (i + 2.2) * (gridSize + 5); })
+        .attr("x", 14)
+        // .on("click", function(d, i) {
+        //     d3.select("#section_date").text("2016/1/" + d);
+        //     section_id_date(section_id, new Date(2016, 0, d, 0, 0, 0));
+        // })
+        .style({
+            "font-size": "8px",
+            // 深灰色
+            "fill": "#696969",
+            "text-anchor": "middle"
+        });
+
+    // 添加颜色小方块
+    var calendarRects = weather_g.selectAll(".sort")
         .data(data)
         .enter()
         .append("rect")
-        .attr("y", function(d, i) { return (d.sort + 5) * gridSize + (i % 18) * 2; })
-        .attr("x", function(d, i) { return (d.Index + 1) * gridSize; })
+        .attr("y", function(d, i) {
+            // console.log("d.sort");
+            // console.log(d.sort);
+            return (d.sort + 1) * 20 + 5;
+        })
+        .attr("x", function(d, i) {
+            // console.log("d.Index");
+            // console.log(d.Index);
+            return (d.Index + 7.8) * 2;
+        })
         .attr("class", function(d) {
             if (d.sum === null)
-                return "hour";
+                return "sort";
             else
-                return "hour " + threshold(d.sum);
+                return "sort " + threshold(d.sum);
         })
         .attr('fill', function(d) {
             // 速度为零时
             if (!d.sum)
             // 深蓝色
                 return "#302b63";
+            // else return threshold(d.sum);
         })
         .attr("width", gridSize)
         .attr("height", gridSize)
@@ -405,7 +458,8 @@ function drawWeather(data) {
     .style({
             "opacity": .7
         })
-        .attr("transform", "translate(0," + 2 * gridSize + ")");
+        .attr("transform", "translate(0," + gridSize / 2 + ")");
+
 
     // // 面积图右边的那个日期
     // calendar_rects.append("title")
@@ -417,37 +471,43 @@ function drawWeather(data) {
     //         "fill": "#ffffff",
     //         "text-anchor": "middle"
     //     });
-    // // 横线的颜色注释
-    // legend_g.selectAll(".calendar_legend")
-    //     .data(color_scale)
-    //     .enter()
-    //     .append("rect")
-    //     .attr("x", function(d, i) {
-    //         return i * gridSize * 31 / 5;
-    //     })
-    //     .attr("y", 0)
-    //     .attr("width", gridSize * 31 / 5)
-    //     .attr("height", 5)
-    //     .style("fill", function(d) {
-    //         return d;
-    //     });
+    var color_scale = ["#40E0D0", "#23D561", "#9CD523", "#FFBF3A", "#FB8C00", "#FF5252"];
+    // 横线的颜色注释
+    legend_g.selectAll(".colorLegend")
+        .data(color_scale)
+        .enter()
+        .append("rect")
+        .attr("x", function(d, i) {
+            return i * gridSize * 17 / 6;
+        })
+        .attr("y", 0)
+        .attr("width", gridSize * 17 / 6)
+        .attr("height", 5)
+        // .attr("transform", "translate(0,10)")
+        .style("fill", function(d) {
+            return d;
+        });
 
-    // var legend_content = [40, 30, 20, 10];
+    var legend = [5, 10, 15, 20, 25];
 
-    // legend_g.selectAll(".legend_text")
-    //     .data(legend_content)
-    //     .enter()
-    //     .append("text")
-    //     .text(function(d) {
-    //         return d + "km/h";
-    //     })
-    //     .attr("x", function(d, i) {
-    //         return (i + 1) * gridSize * 31 / 5;
-    //     })
-    //     .attr("y", 15)
-    //     .style({
-    //         "fill": "#FFFFFF",
-    //         "font-size": "8",
-    //         "text-anchor": "middle"
-    //     });
+    legend_g.selectAll(".legendText")
+        .data(legend)
+        .enter()
+        .append("text")
+        .text(function(d) {
+            return d + "次";
+        })
+        .attr("x", function(d, i) {
+            return (i + 1) * gridSize * 17 / 6;
+        })
+        .attr("y", 14)
+        .style({
+            "fill": "#696969",
+
+            "font-size": "8px",
+
+            "text-anchor": "middle"
+
+        });
+
 }

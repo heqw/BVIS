@@ -26,7 +26,6 @@
             display: flex;
             flex-wrap: wrap;
         }
-
         /* #container1 {
             margin: 5px;
             width: 200px;
@@ -77,7 +76,6 @@
             width: 860px;
             border: solid 1px rgb(247, 121, 121);
         }  */
-
         /* .dayline {
             margin: 5px;
             padding: 5px;
@@ -86,7 +84,6 @@
             width: 880px;
             border: solid 1px black;
         } */
-
         /* .frame {
             margin: 5px;
             padding: 5px;
@@ -95,27 +92,41 @@
             width: 175px;
             border: solid 1px black;
         } */
-
-        #map {
+        /* #map {
             position: absolute;
             top: 8%;
             left: 20%;
             width: 60%;
             height: 85%;
+        } */
+        
+        #weather {
+            position: absolute;
+            top: 2%;
+            left: 7%;
+            width: 50%;
+            height: 40%;
+            /* bottom: 1px; */
         }
-
+        
+        #weatherView {
+            /* position: absolute; */
+            height: 100%;
+            width: 100%;
+        }
+        
         #headTitle {
             font-size: 12px;
             position: absolute;
             left: 31%;
             top: 1%;
         }
-
+        
         .leftName {
             position: absolute;
             font-size: 12px;
         }
-
+        
         #wholeView {
             /* position: fixed; */
             width: 100%;
@@ -131,7 +142,7 @@
             <h1>共享单车数据的用户时空行为特征可视分析系统</h1>
         </div>
 
-        <div id="wordCloud">
+        <!-- <div id="wordCloud">
             <div class="leftName">单日单车站热度</div>
             <div id="wordCloudView"></div>
         </div>
@@ -139,7 +150,7 @@
         <div id="timeLine">
             <div class="leftName">一周骑行时间分布</div>
             <div id="timeLineView"></div>
-        </div>
+        </div> -->
         <!-- <div id = "weather">
             <div class = "leftName">天气</div>
             <div id = "weatherView"></div>
@@ -155,11 +166,10 @@
             <div id="locationView"></div>
         </div> -->
 
-        <div id="map">
-            <div class="mapName">行程路线</div>
-            <div id="mapView"></div>
+        <div id="weather">
+            <div class="rightName">天气</div>
+            <div id="weatherView"></div>
         </div>
-
         <!-- <div id="dayLine">
             <div class="dayName">24小时时间分布</div>
             <div id="dayView"></div>
@@ -211,12 +221,14 @@
     </div> -->
 </body>
 <!-- <script src="../public/js/firstReq.js"></script> -->
-<link rel="stylesheet" href="../public/stylesheets/wordCloud.css">
-<link rel="stylesheet" href="../public/stylesheets/timeLine.css">
-
-<script src="../public/js/map.js"></script>
+<!-- <link rel="stylesheet" href="../public/stylesheets/wordCloud.css">
+<link rel="stylesheet" href="../public/stylesheets/timeLine.css"> -->
+<script src="../public/js/bianliang.js"></script>
+<!-- <script src="../public/js/calendar.js"></script> -->
+<!-- <script src="../public/js/map.js"></script>
 <script src="../public/js/timeLine.js"></script>
-<script src="../public/js/wordCloud.js"></script>
+<script src="../public/js/wordCloud.js"></script> -->
+<script src="../public/js/weather.js"></script>
 
 
 </html>
