@@ -24,14 +24,42 @@ function sendTimeReq() {
             data.forEach(function(d) {
                 d.week = new Date(d.start_time).getUTCDay();
             });
-            handleData(data);
+            weatherInTime(data);
+            // handleData(data);
         },
         complete: function() {},
         error: function() {}
     });
 }
 
-function handleData(data) {
+function weatherInTime(data) {
+    $.ajax({
+
+        url: "http://localhost:3000/timeLineWeather",
+        dataType: 'json',
+        crossDomain: false,
+        data: {
+            tstartyear: a.weekStartYear,
+            tstartmonth: a.weekStartMonth,
+            tstartday: a.weekStartDay,
+            tendyear: a.weekEndYear,
+            tendmonth: a.weekEndMonth,
+            tendday: a.weekEndDay
+        },
+        async: true,
+        type: "GET",
+        contentType: "application/json",
+        beforeSend: function() {},
+        success: function(weatherdata, textStatus) {
+
+            handleData(data, weatherdata);
+        },
+        complete: function() {},
+        error: function() {}
+    });
+}
+
+function handleData(data, weatherdata) {
     var nest = d3.nest().key(function(d) {
         if (d.week == 0) d.week = 7;
         return d.week
@@ -60,20 +88,52 @@ function handleData(data) {
     userData.push(memberData);
     userData.push(shortData);
 
-    drawtime(userData);
+    var rain = ["降雨："];
+    var wind = ["阵风："];
+    var i = 1,
+        j = 1;
+    weatherdata.forEach(function(d) {
+            // 都有天气事件或有降水量
+            if (d.Event != null || d.Precipitation_In != 0) {
+                // 小雨 RainIndex=1
+                if (d.Precipitation_In <= 0.39) rain[i] = "小雨";
+                // 中雨 RainIndex=2
+                else if (d.Precipitation_In > 0.39 && d.Precipitation_In <= 0.98) rain[i] = "中雨";
+                // 大雨，RainIndex=3
+                else if (d.Precipitation_In > 0.98 && d.Precipitation_In <= 1.96) rain[i] = "大雨";
+                // 暴雨，RainIndex=4
+                else if (d.Precipitation_In > 1.96) rain[i] = "暴雨";
+            } else rain[i] = "无雨";
+            i++;
+            // 7、8级风骑车不安全;6级风没体力顶不动,5级风骑车尚可
+            // 0-5级风 WindIndex=5
+            if (d.Max_Gust_Speed_MPH <= 25 || d.Max_Gust_Speed_MPH == "-") wind[j] = "0-5级";
+            // 6级风 WindIndex=6
+            else if (d.Max_Gust_Speed_MPH > 25 && d.Max_Gust_Speed_MPH <= 31) wind[j] = "6级";
+            // 7风 树枝摇动 WindIndex=7
+            else if (d.Max_Gust_Speed_MPH > 31 && d.Max_Gust_Speed_MPH <= 38) wind[j] = "7级";
+            // 8风，WindIndex=8
+            else if (d.Max_Gust_Speed_MPH > 38 && d.Max_Gust_Speed_MPH <= 46) wind[j] = "8级";
+            // 9风，WindIndex=9
+            else if (d.Max_Gust_Speed_MPH > 47) wind[j] = "9级";
+            else wind[j] = "0";
+            j++;
+        })
+        // console.log(weatherIndex);
+    drawtime(userData, wind, rain);
     // drawtime(memberData);
     // drawtime(shortData);
-    //console.log(userData);
+    console.log(userData);
     // console.log(memberData);
     // console.log(shortData);
 }
 
-function drawtime(data) {
+function drawtime(data, wind, rain) {
     //console.log("time1");
-    var color = ["#FFD700", "#9d2933"];
+    var color = ["#FFD700", "#C47F85"];
     var time_line_wh = $("#timeLineView");
 
-    var margin = { top: 20, right: 20, bottom: 20, left: 0 },
+    var margin = { top: 20, right: 0, bottom: 20, left: 0 },
         width = time_line_wh.width() - margin.left - margin.right,
         height = time_line_wh.height() - margin.top - margin.bottom;
 
@@ -124,11 +184,11 @@ function drawtime(data) {
     // var routes_s = svg.append("g")
     //     .attr("transform", "translate(" + (margin.left + 30) + ",20)");
     // member
-    var routes = routes_g.selectAll(".route_line")
+    var routes = routes_g.selectAll(".useLine")
         .data(data)
         .enter()
         .append("g")
-        .attr("class", function(d) { return "routes_line route_" + parseInt(d.key) });
+        .attr("class", function(d) { return "useLine use" + parseInt(d.key) });
 
     routes.append("path")
         .attr('fill', "none")
@@ -140,9 +200,52 @@ function drawtime(data) {
         .attr("d", function(d, i) {
             return line(data[i])
         })
-    var weather = ['rain', 'rain', 'sunny', 'frog', 'rain', 'rain', 'rain'];
-    svg.selectAll(".text")
-        .data(weather)
+
+    var labels = ["会员", "普通用户"];
+    var legend_div = d3.select("#timeLine").append("div")
+        .attr("id", "time_line_label")
+        .style({
+            "position": "absolute",
+            "z-index": "999",
+            "right": "10px",
+            "top": "10px"
+        })
+        .selectAll("label label-default legend_label")
+        .data(labels)
+        .enter()
+        .append("span")
+        .attr("class", "label label-default legend_label")
+        // .on("mouseover", function(d) {
+        //     d3.selectAll(".useLine").style("opacity", 0.3);
+        //     d3.select(".use" + d).style("opacity", 1);
+        // })
+        // .on("mouseout", function(d) {
+        //     d3.selectAll(".useLine").style("opacity", 1)
+        // })
+        // .on("click", function(d) {
+        //     spiral_line(d.key, [new Date(2016, 0, 1, 0, 0, 0),
+        //         new Date(2016, 0, 2, 0, 0, 0)
+        //     ]);
+
+    //message_cloud(d.key)
+    //})
+    .style({
+            "background-color": function(d, i) {
+                return color[i];
+            },
+            "cursor": "pointer",
+            "margin": "7px",
+            "curos-events": "none"
+        })
+        .html(function(d) {
+            return d;
+        });
+
+
+
+    // var weather = ['rain', 'rain', 'sunny', 'frog', 'rain', 'rain', 'rain'];
+    svg.selectAll(".text1")
+        .data(rain)
         .enter()
         .append("text")
         .text(function(d) {
@@ -152,10 +255,26 @@ function drawtime(data) {
         .attr("font-size", "10px")
         .attr("x", function(d, i) {
             // return i * (100 / weather.length);
-            return i * 34 + 15;
+            return i * 33;
         })
         .attr("y", function(d) {
-            return 160;
+            return 165;
+        });
+    svg.selectAll(".text2")
+        .data(wind)
+        .enter()
+        .append("text")
+        .text(function(d) {
+            return d;
+        })
+        .attr("fill", "black")
+        .attr("font-size", "10px")
+        .attr("x", function(d, i) {
+            // return i * (100 / weather.length);
+            return i * 33;
+        })
+        .attr("y", function(d) {
+            return 180;
         });
 
     // short user

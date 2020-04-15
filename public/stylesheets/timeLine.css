@@ -1,24 +1,24 @@
         #timeLine {
             position: absolute;
-            top: 63%;
-            left: 1%;
+            top: 9%;
+            left: 79%;
             height: 30%;
             width: 19%;
         }
-
+        
         #timeLineView {
             /* position: absolute; */
             height: 100%;
             width: 100%;
         }
-
+        
         #timeLineView .axis path,
         .axis line {
             fill: none;
             stroke: rgb(0, 0, 0);
             stroke-width: 1px;
         }
-
+        
         #timeLineView .axis text {
             fill: rgb(0, 0, 0);
             font-size: 10px;

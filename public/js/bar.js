@@ -258,6 +258,7 @@ function drawBar(data) {
         d.valores[1].OD = d.toID;
         //}
     });
+    console.log(data);
     // console.log(data[0].valores);
     // console.log(data[1].valores);
     var y = d3.scale.linear()
@@ -351,6 +352,20 @@ function drawBar(data) {
         .attr("x", function(d) { return x1(d.name) + 30; }) //设置rect的x坐标。
         .attr("y", function(d) { return y(d.value) + 30; }) //设置y的所在位置
         .attr("value", function(d) { return d.name; })
+        .on("click", function(d) {
+            mainChart.data_point.features.forEach(function(s) {
+                if (s.properties.station_id === d.OD) {
+                    map.flyTo({ center: s.geometry.coordinates });
+                    if (mainChart.Msg_pop)
+                        mainChart.Msg_pop.remove();
+                    var description = 'NAME:' + s.properties.description + '<p>' + 'ID:' + s.properties.station_id;
+                    mainChart.Msg_pop = new mapboxgl.Popup()
+                        .setLngLat(s.geometry.coordinates)
+                        .setHTML(description)
+                        .addTo(map);
+                }
+            });
+        })
         .style("fill", function(d) { return color(d.name); });
 
 
@@ -371,10 +386,38 @@ function drawBar(data) {
         // .attr("dy", function(d) {
         //     return 20;
         // })
-        .attr("font-size", 8)
+        .attr("font-size", 7)
         .text(function(d) {
             return d.OD;
         });
+
+    var Color = ["#1F77B4", "#AEC7E8"];
+    var labels = ["O", "D"];
+    var legend_div = d3.select("#bar").append("div")
+        .attr("id", "bar_label")
+        .style({
+            "position": "absolute",
+            "z-index": "999",
+            "right": "10px",
+            "top": "10px"
+        })
+        .selectAll("label label-default legend_label")
+        .data(labels)
+        .enter()
+        .append("span")
+        .attr("class", "label label-default legend_label")
+        .style({
+            "background-color": function(d, i) {
+                return Color[i];
+            },
+            "cursor": "pointer",
+            "margin": "7px",
+            "curos-events": "none"
+        })
+        .html(function(d) {
+            return d;
+        });
+
     // var tooltip = d3.select("#bar")
     //     .append("div")
     //     .attr("class", "tooltip")

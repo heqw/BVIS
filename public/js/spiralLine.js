@@ -133,7 +133,7 @@ function drawSpiral(data_10min) {
         .attr("transform", "translate(0," + 0 + ")");
 
     var g = svg.append("g")
-        .attr("transform", "translate(" + width / 2 + "," + height / 1.8 + ")");
+        .attr("transform", "translate(" + width / 2.3 + "," + height / 1.8 + ")");
 
     // .range(start,stop,step)
     // 以start为起点，以stop为终点，以step为前后项的差值 等差数列

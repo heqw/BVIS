@@ -1,7 +1,7 @@
 //mapbox
 //var bounds = [[104.57336425, 31.32255387], [104.91016387, 31.59725256]];
 
-mapboxgl.accessToken = 'pk.eyJ1Ijoic2hlbmhvbmdpc3NreSIsImEiOiJjaXlzanRtNGswMDB3MzNvNDh3NzJqNmNnIn0.8LvCg1s5Qb88lwItbSFOzg';
+mapboxgl.accessToken = 'pk.eyJ1Ijoic2lsZW50bGwiLCJhIjoiY2o4NGEycGN2MDZ4ZDMza2Exemg4YmtkaCJ9.LaSV_2wU1XbulGlrDiUgTw';
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v9',
@@ -16,6 +16,7 @@ var map = new mapboxgl.Map({
 //  var daytripInfo;
 //console.log(stationInfo);
 
+var mainChart = {};
 // var dayTripInfo;
 DrawStation();
 
@@ -88,10 +89,10 @@ function drawMap(station, dayTripInfo) {
     // 存储O的long lat,D的long lat,绘制路线
     var od = [];
     //给每一个单车数据添加feature
-    var stationFeatures = [];
+    mainChart.stationFeatures = [];
 
     station.forEach(function(d) {
-        stationFeatures.push({
+        mainChart.stationFeatures.push({
             "type": "Feature", //则该对象必须有属性 geometry，其值为一个几何对象；此外还有一个属性 properties，可以是任意 JSON 或 null
             //properties里面可以封装各种属性，例如名称、标识颜色
             "properties": {
@@ -196,9 +197,9 @@ function drawMap(station, dayTripInfo) {
 
 
     //data_point是车站的集合？画站点位置用
-    var data_point = {
+    mainChart.data_point = {
         "type": "FeatureCollection", //则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
-        "features": stationFeatures
+        "features": mainChart.stationFeatures
     }; //console.log(stationFeatures);
 
 
@@ -207,7 +208,8 @@ function drawMap(station, dayTripInfo) {
     // var colors = ["#EDC951", "#CC333F", "#00A0B0", "#ff5a29", "#2f71b0", "#55ff30", "#570eb0", "#883378"];
     //           2-3           4-7        8-11        12-15       16-19
     //             深卡其布    黄色         纯红        耐火砖       栗色
-    var colors = ["#BDB76B", "#EDC951", "#FF0000", "#B22222", "#800000"];
+    // var colors = ["#BDB76B", "#EDC951", "#FF0000", "#B22222", "#800000"];
+    var colors = ["#F8CF5F", "#F3B554", "#EB7E37", "#C25432", "#743D32"];
     var buildLines = function() {
         var features = [];
         var curveness = 0.3;
@@ -239,7 +241,7 @@ function drawMap(station, dayTripInfo) {
                     },
                     "properties": {
                         "color": colors[Math.floor(trips[i].tripsSum / 4)],
-                        "line-width": trips[i].tripsSum
+                        "line-width": trips[i].tripsSum / 2
                     },
                 }); //console.log(Math.floor(trips[i].tripsSum / 4));
             }
@@ -263,9 +265,9 @@ function drawMap(station, dayTripInfo) {
                 ]; //console.log(control);
 
                 // 为了绘制彗星尾迹，需要同时画出count个半径递增的圆点
-                var count = 200;
+                var count = 400;
                 // 最大圆点的半径
-                var maxRadius = 2;
+                var maxRadius = 1;
                 // 求出当前时间点小圆点的坐标
                 var t = time;
                 for (var j = 0; j < count; j++) {
@@ -281,7 +283,7 @@ function drawMap(station, dayTripInfo) {
                             "coordinates": [x, y],
                         },
                         // Math.floor(trips[i].tripsSum / 4 有的是0，所以+1保证非零
-                        "properties": { "radius": (Math.floor(trips[i].tripsSum / 4) + 1) * 2.8 * j / count, "color": colors[Math.floor(trips[i].tripsSum / 4)] },
+                        "properties": { "radius": (Math.floor(trips[i].tripsSum / 7) + trips[i].tripsSum * 0.3) * j / count, "color": colors[Math.floor(trips[i].tripsSum / 4)] },
                     });
                 }
             }
@@ -304,7 +306,7 @@ function drawMap(station, dayTripInfo) {
         //map.addSource(id,source)id为数据源id，这些数据源名叫id;source数据源对象,描述数据？
         map.addSource("station_source", {
             "type": "geojson",
-            'data': data_point
+            'data': mainChart.data_point
         });
         // addLayer(layer,beforeid) layer需要添加的样式图层;beforeid 用来插入新图层的现有图层 ID
         map.addLayer({
@@ -315,12 +317,12 @@ function drawMap(station, dayTripInfo) {
             "type": "circle",
             "paint": {
                 //点的属性
-                "circle-radius": 6,
-                "circle-color": "#DC143C",
+                "circle-radius": 4,
+                "circle-color": "#2C5F98",
                 "circle-opacity": 1,
                 //点外层一圈的属性
-                "circle-stroke-color": "#9c9c9c",
-                "circle-stroke-width": 3,
+                "circle-stroke-color": "#CEE7CC",
+                "circle-stroke-width": 1,
                 "circle-opacity": 1
             }
         }, 'waterway-label');
