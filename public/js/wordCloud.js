@@ -58,7 +58,7 @@ function figureTime(data) {
         d.flag = 0;
     });
 
-    console.log(O);
+    //console.log(O);
     var wordData = [];
     O.forEach(function(d) {
         d.flag = 0;
@@ -82,14 +82,14 @@ function figureTime(data) {
     })
 
     D.forEach(function(d) {
-        if (d.flag == 0 && d.toSum > 4) {
-            wordData.push({ key: d.key, useTime: parseInt(d.toSum), station_id: d.values[0].from_station_id });
-        }
-    })
-    console.log(O);
-    console.log(D);
-    console.log(wordData);
-    //画词云
+            if (d.flag == 0 && d.toSum > 4) {
+                wordData.push({ key: d.key, useTime: parseInt(d.toSum), station_id: d.values[0].from_station_id });
+            }
+        })
+        // console.log(O);
+        // console.log(D);
+        // console.log(wordData);
+        //画词云
     var word = [];
     for (i = 0; i < wordData.length; i++) {
         word.push({ key: wordData[i].key, useTime: wordData[i].useTime, station_id: wordData[i].station_id });
@@ -115,10 +115,10 @@ function figureTime(data) {
 
 
     });
-    console.log("word");
-    console.log(word);
-    console.log("sort15");
-    console.log(sort15);
+    // console.log("word");
+    // console.log(word);
+    // console.log("sort15");
+    // console.log(sort15);
     draw(sort15);
 }
 

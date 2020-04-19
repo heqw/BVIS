@@ -173,22 +173,169 @@ function drawtime(data, wind, rain) {
 
 
     var line = d3.svg.line().x(function(d, i) {
-        return x_scale(parseInt(d.key));
+        return x_scale(d.key);
     }).y(function(d) {
         return y_scale(d.daySum);
 
-    }).interpolate("basis");
-
+    }).interpolate("linear");
+    //console.log(line(data[0]));
     var routes_g = svg.append("g")
         .attr("transform", "translate(" + (margin.left + 30) + ",20)");
     // var routes_s = svg.append("g")
     //     .attr("transform", "translate(" + (margin.left + 30) + ",20)");
+
+    // for (i = 0; i < 2; i++) {
+    //     var arr = data[i];
+    //     var routes = routes_g.selectAll(".useLine")
+    //         .data(arr)
+    //         .enter()
+    //         .append("g")
+    //         .attr("class", function(d, i) { return "useLine use" + parseInt(i) });
+
+    //     routes.append("path")
+    //         .attr('fill', "none")
+    //         .attr('opacity', 0.6)
+    //         .attr('stroke', function(d, i) {
+    //             return color[i];
+    //         })
+    //         .attr("stroke-width", 2)
+    //         .attr("d", function(d) {
+    //             return line(arr)
+    //         })
+    //         .attr("daySum", function(d) {
+    //             return (d.daySum);
+    //         })
+    //         .on('mouseover', function(d) {
+    //             // d3.select("#timeLineView").selectAll("g")
+    //             //     .style("opacity", 0.3);
+    //             // d3.select(this)
+    //             //     .style("opacity", 1);
+
+    //             var daySum = d3.select(this).attr("daySum");
+    //             console.log(daySum);
+    //             var dd = d3.select(this).attr("d");
+    //             //console.log(d);
+    //             // var x = d3.select(this).attr("x");
+    //             // var y = d3.select(this).attr("y");
+    //             var tip = routes_g.append("text")
+    //                 .attr("id", "messenge")
+    //                 .text("次数：" + daySum)
+    //                 .attr("fill", "black")
+    //                 .attr("font-size", "11px")
+    //                 .attr("transform", "translate(2,21)");
+    //             //.attr("transform", "translate(" + (x - 45) + "," + (y - 10) + ")")
+    //         })
+    //         .on('mousemove', function(d) {})
+    //         .on('mouseout', function(d) {
+    //             // d3.select("#timeLineView").selectAll("g")
+    //             //     .style("opacity", 1);
+    //             d3.select("#messenge").remove();
+    //         });
+    // }
+
+    // 画点
+    var group = svg.append("g")
+        .attr("transform", "translate(" + (margin.left + 30) + ",20)");
+    group.selectAll("circle")
+        .data(data[0])
+        .enter()
+        .append("circle")
+        .attr("cx", function(d, i) {
+            return x_scale(d.key);
+        })
+        .attr("cy", function(d) {
+            return y_scale(d.daySum);
+        })
+        .attr("r", 3)
+        .attr("fill", function(d, i) {
+            return color[0];
+        })
+        .attr("daySum", function(d) {
+            return d.daySum;
+        })
+        .attr("key", function(d) {
+            return d.key;
+        })
+        .on('mouseover', function(d) {
+            var daySum = d3.select(this).attr("daySum");
+            var key = d3.select(this).attr("key");
+            var cx = d3.select(this).attr("cx");
+            var cy = d3.select(this).attr("cy");
+            if (key == 6 || key == 7) cx -= 50;
+            // console.log(daySum);
+            // var dd = d3.select(this).attr("d");
+            //console.log(d);
+            // var x = d3.select(this).attr("x");
+            // var y = d3.select(this).attr("y");
+            var tip = routes_g.append("text")
+                .attr("id", "messenge")
+                .text("次数：" + daySum)
+                .attr("fill", "black")
+                .attr("font-size", "11px")
+                .attr("transform", "translate(" + cx + "," + (cy - 20) + ")")
+                //.attr("transform", "translate(" + (x - 45) + "," + (y - 10) + ")")
+        })
+        .on('mousemove', function(d) {})
+        .on('mouseout', function(d) {
+            // d3.select("#timeLineView").selectAll("g")
+            //     .style("opacity", 1);
+            d3.select("#messenge").remove();
+        });
+
+    var group2 = svg.append("g")
+        .attr("transform", "translate(" + (margin.left + 30) + ",20)");
+    group2.selectAll("circle")
+        .data(data[1])
+        .enter()
+        .append("circle")
+        .attr("cx", function(d, i) {
+            return x_scale(d.key);
+        })
+        .attr("cy", function(d) {
+            return y_scale(d.daySum);
+        })
+        .attr("r", 3)
+        .attr("fill", function(d, i) {
+            return color[1];
+        })
+        .attr("daySum", function(d) {
+            return d.daySum;
+        })
+        .attr("key", function(d) {
+            return d.key;
+        })
+        .on('mouseover', function(d) {
+            var daySum = d3.select(this).attr("daySum");
+            var key = d3.select(this).attr("key");
+            var cx = d3.select(this).attr("cx");
+            var cy = d3.select(this).attr("cy");
+            if (key == 6 || key == 7) cx -= 50;
+            // console.log(daySum);
+            // var dd = d3.select(this).attr("d");
+            //console.log(d);
+            // var x = d3.select(this).attr("x");
+            // var y = d3.select(this).attr("y");
+            var tip = routes_g.append("text")
+                .attr("id", "messenge")
+                .text("次数：" + daySum)
+                .attr("fill", "black")
+                .attr("font-size", "11px")
+                .attr("transform", "translate(" + cx + "," + (cy - 20) + ")")
+                //.attr("transform", "translate(" + (x - 45) + "," + (y - 10) + ")")
+        })
+        .on('mousemove', function(d) {})
+        .on('mouseout', function(d) {
+            // d3.select("#timeLineView").selectAll("g")
+            //     .style("opacity", 1);
+            d3.select("#messenge").remove();
+        });
+
     // member
     var routes = routes_g.selectAll(".useLine")
         .data(data)
         .enter()
         .append("g")
-        .attr("class", function(d) { return "useLine use" + parseInt(d.key) });
+        .attr("class", function(d, i) { return "useLine use" + parseInt(i) });
 
     routes.append("path")
         .attr('fill', "none")
@@ -200,6 +347,13 @@ function drawtime(data, wind, rain) {
         .attr("d", function(d, i) {
             return line(data[i])
         })
+        .attr("daySum", function(d) {
+            d.forEach(function(s) {
+                console.log(s.daySum);
+                return s.daySum;
+            })
+        })
+
 
     var labels = ["会员", "普通用户"];
     var legend_div = d3.select("#timeLine").append("div")

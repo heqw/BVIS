@@ -4,7 +4,8 @@
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2lsZW50bGwiLCJhIjoiY2o4NGEycGN2MDZ4ZDMza2Exemg4YmtkaCJ9.LaSV_2wU1XbulGlrDiUgTw';
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v9',
+    style: 'mapbox://styles/mapbox/light-v9',
+    // style: 'mapbox://styles/mapbox/streets-v9',
 
     //A zoom level determines how much of the world is visible on a map，缩放级别
     zoom: 11.7,
@@ -249,12 +250,23 @@ function drawMap(station, dayTripInfo) {
         return features;
     };
 
-    // 画贝塞尔的运动点
+    // 多少秒为一个周期
+    //var cycle = 10000;
+    var n = 0,
+        N = 0;
+    trips.forEach(function(d) {
+            d.cycle = 10000;
+        })
+        // 画贝塞尔的动态点
     var buildPoints = function(time) {
         var features = [];
         var curveness = 0.3;
+        // console.log("time");
+        // console.log(time);
+
         for (var i = 0; i < trips.length; i++) {
             if (trips[i].tripsSum > 2) {
+                N++;
                 var startLong = Number(trips[i].fromLong);
                 var startLat = Number(trips[i].fromLat);
                 var endLong = Number(trips[i].toLong);
@@ -264,32 +276,100 @@ function drawMap(station, dayTripInfo) {
                     (startLat + endLat) / 2 - (startLong - endLong) * curveness
                 ]; //console.log(control);
 
-                // 为了绘制彗星尾迹，需要同时画出count个半径递增的圆点
-                var count = 400;
-                // 最大圆点的半径
-                var maxRadius = 1;
                 // 求出当前时间点小圆点的坐标
                 var t = time;
-                for (var j = 0; j < count; j++) {
-                    t += 0.001;
-                    if (t > 1) break;
-                    var x = Math.pow((1 - t), 2) * startLong + 2 * t * (1 - t) * control[0] + Math.pow(t, 2) * endLong;
-                    var y = Math.pow((1 - t), 2) * startLat + 2 * t * (1 - t) * control[1] + Math.pow(t, 2) * endLat;
-
-                    features.push({
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": [x, y],
-                        },
-                        // Math.floor(trips[i].tripsSum / 4 有的是0，所以+1保证非零
-                        "properties": { "radius": (Math.floor(trips[i].tripsSum / 7) + trips[i].tripsSum * 0.3) * j / count, "color": colors[Math.floor(trips[i].tripsSum / 4)] },
-                    });
+                if (time > trips[i].cycle) t = time % trips[i].cycle;
+                var x = Math.pow((1 - t), 2) * startLong + 2 * t * (1 - t) * control[0] + Math.pow(t, 2) * endLong;
+                var y = Math.pow((1 - t), 2) * startLat + 2 * t * (1 - t) * control[1] + Math.pow(t, 2) * endLat;
+                //  获得周期时间 注意有些行程OD一样
+                if (Math.abs(x - endLong) < 0.0001 && startLong != endLong) {
+                    trips[i].cycle = time;
+                    // n++;
+                    //console.log(i);
+                    // console.log(cycle);
                 }
+                // console.log("cycle");
+                // console.log(trips[i].cycle);
+                //console.log(n);
+
+                //x要在OD间：Ox< x <Dx 或 Dx< x <Ox 不在OD间：x>Ox && x>Dx 或x<Ox && x<Dx 
+                // var xlen, ylen, xout, yout, xchange, ychange;
+                // if ((x > startLong && x > endLong) || (x < startLong && x < endLong)) {
+                //     xlen = startLong - endLong;
+                //     ylen = startLat - endLat;
+                //     // while (x) x -= xlen;
+                //     // while (y) y -= ylen;
+                //     // x += xlen;
+                //     // y += ylen;
+                //     xout = endLong - x;
+                //     yout = endLat - y;
+                //     // 求多出来的x并且取正负号判断OD方向 xout为+代表是往左走，-是往右走 -xout
+                //     x = Math.abs(xout) % Math.abs(xlen) * (-xout / Math.abs(xout)) + startLong;
+                //     y = Math.abs(yout) % Math.abs(ylen) * (-yout / Math.abs(yout)) + startLat;
+                // }
+                features.push({
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [x, y],
+                    },
+                    // // Math.floor(trips[i].tripsSum / 4 有的是0，所以+1保证非零
+                    // "properties": { "radius": (Math.floor(trips[i].tripsSum / 7) + trips[i].tripsSum * 0.3) * j / count, "color": colors[Math.floor(trips[i].tripsSum / 4)] },
+                    "properties": {
+                        "radius": (Math.floor(trips[i].tripsSum / 7) + trips[i].tripsSum * 0.3),
+                        "color": colors[Math.floor(trips[i].tripsSum / 4)]
+                    },
+                });
+
             }
         }
-        return features;
+        return { /* geojson数据 */
+            "type": "FeatureCollection",
+            "features": features
+        };
     };
+
+    // // 画贝塞尔的运动点
+    // var buildPoints = function(time) {
+    //     var features = [];
+    //     var curveness = 0.3;
+    //     for (var i = 0; i < trips.length; i++) {
+    //         if (trips[i].tripsSum > 2) {
+    //             var startLong = Number(trips[i].fromLong);
+    //             var startLat = Number(trips[i].fromLat);
+    //             var endLong = Number(trips[i].toLong);
+    //             var endLat = Number(trips[i].toLat); //console.log(typeof(endLat));
+    //             var control = [
+    //                 (startLong + endLong) / 2 - (startLat - endLat) * curveness,
+    //                 (startLat + endLat) / 2 - (startLong - endLong) * curveness
+    //             ]; //console.log(control);
+
+    //             // 为了绘制彗星尾迹，需要同时画出count个半径递增的圆点
+    //             var count = 400;
+    //             // 最大圆点的半径
+    //             var maxRadius = 1;
+    //             // 求出当前时间点小圆点的坐标
+    //             var t = time;
+    //             for (var j = 0; j < count; j++) {
+    //                 t += 0.001;
+    //                 if (t > 1) break;
+    //                 var x = Math.pow((1 - t), 2) * startLong + 2 * t * (1 - t) * control[0] + Math.pow(t, 2) * endLong;
+    //                 var y = Math.pow((1 - t), 2) * startLat + 2 * t * (1 - t) * control[1] + Math.pow(t, 2) * endLat;
+
+    //                 features.push({
+    //                     "type": "Feature",
+    //                     "geometry": {
+    //                         "type": "Point",
+    //                         "coordinates": [x, y],
+    //                     },
+    //                     // Math.floor(trips[i].tripsSum / 4 有的是0，所以+1保证非零
+    //                     "properties": { "radius": (Math.floor(trips[i].tripsSum / 7) + trips[i].tripsSum * 0.3) * j / count, "color": colors[Math.floor(trips[i].tripsSum / 4)] },
+    //                 });
+    //             }
+    //         }
+    //     }
+    //     return features;
+    // };
 
 
 
@@ -370,14 +450,42 @@ function drawMap(station, dayTripInfo) {
 
 
 
-        // 加载贝塞尔曲线运动点
+        // // 加载贝塞尔曲线运动点
+        // map.addSource("chart-points", {
+        //     "type": "geojson",
+        //     /* geojson类型资源 */
+        //     "data": { /* geojson数据 */
+        //         "type": "FeatureCollection",
+        //         "features": buildPoints(0.1)
+        //     }
+        // });
+        // map.addLayer({
+        //     "id": "chart-points",
+        //     "type": "circle",
+        //     /* circle类型表示一个圆，一般比较小 */
+        //     "source": "chart-points",
+        //     "paint": {
+        //         "circle-radius": ["get", "radius"],
+        //         "circle-color": ["get", "color"],
+        //         /* 圆的颜色 */
+        //         "circle-stroke-width": 1,
+        //         /* 边框宽度 */
+        //         "circle-stroke-color": ["get", "color"],
+        //         /* 边框的颜色 */
+        //         "circle-opacity": 0.5,
+        //         "circle-pitch-alignment": "map"
+        //     }
+        // });
+
+
+        // 加载贝塞尔曲线动态点
         map.addSource("chart-points", {
             "type": "geojson",
             /* geojson类型资源 */
-            "data": { /* geojson数据 */
-                "type": "FeatureCollection",
-                "features": buildPoints(0.1)
-            }
+            "data": /* geojson数据 */
+
+                buildPoints(0)
+
         });
         map.addLayer({
             "id": "chart-points",
@@ -397,7 +505,17 @@ function drawMap(station, dayTripInfo) {
             }
         });
 
+        function animateMarker(timestamp) {
+            // Update the data to a new position based on the animation timestamp. The
+            // divisor in the expression `timestamp / 1000` controls the animation speed.
+            map.getSource('chart-points').setData(buildPoints(timestamp / 10000));
 
+            // Request the next frame of the animation.
+            requestAnimationFrame(animateMarker);
+        }
+
+        // Start the animation.
+        animateMarker(0);
 
 
 

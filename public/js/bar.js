@@ -387,6 +387,20 @@ function drawBar(data) {
         //     return 20;
         // })
         .attr("font-size", 7)
+        .on("click", function(d) {
+            mainChart.data_point.features.forEach(function(s) {
+                if (s.properties.station_id === d.OD) {
+                    map.flyTo({ center: s.geometry.coordinates });
+                    if (mainChart.Msg_pop)
+                        mainChart.Msg_pop.remove();
+                    var description = 'NAME:' + s.properties.description + '<p>' + 'ID:' + s.properties.station_id;
+                    mainChart.Msg_pop = new mapboxgl.Popup()
+                        .setLngLat(s.geometry.coordinates)
+                        .setHTML(description)
+                        .addTo(map);
+                }
+            });
+        })
         .text(function(d) {
             return d.OD;
         });

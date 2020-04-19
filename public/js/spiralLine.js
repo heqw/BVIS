@@ -104,8 +104,8 @@ function handleSpiralTime(data) {
 
     drawSpiral(data_10min);
 
-    // console.log("data_10min:");
-    // console.log( data_10min);
+    console.log("data_10min:");
+    console.log(data_10min);
 }
 
 function drawSpiral(data_10min) {
@@ -208,6 +208,12 @@ function drawSpiral(data_10min) {
         .attr("height", function(d) {
             return yScale(d.value);
         })
+        .attr("sumUse", function(d) {
+            return d.value;
+        })
+        .attr("date", function(d) {
+            return d.date;
+        })
         .style({
             "fill": "#9d2933",
             "stroke": "none"
@@ -215,6 +221,35 @@ function drawSpiral(data_10min) {
         .attr("transform", function(d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")";
         })
+        .on('mouseover', function(d) {
+            d3.select("#spiralLine").selectAll("rect")
+                .style("opacity", 0.3);
+            d3.select(this)
+                .style("opacity", 1);
+
+            var show = d3.select(this).attr("sumUse");
+            var date = d3.select(this).attr("date");
+            var hour = new Date(date).getHours();
+            var minute = new Date(date).getMinutes();
+            if (minute == '0') minute = "00";
+            var x = d3.select(this).attr("x");
+            var y = d3.select(this).attr("y");
+            var tip = g.append("text")
+                .attr("id", "messenge")
+                .text("时间" + hour + ":" + minute + " " + "次数：" + show)
+                .attr("fill", "black")
+                .attr("font-size", "11px")
+                //.attr("transform", "translate(2,21)");
+                .attr("transform", "translate(" + (x - 45) + "," + (y - 10) + ")")
+        })
+        .on('mousemove', function(d) {})
+        .on('mouseout', function(d) {
+            d3.select("#spiralLine").selectAll("rect")
+                .style("opacity", 1);
+            d3.select("#messenge").remove();
+        });
+
+
 
     var tF = d3.time.format("%H:%M"),
         firstInMonth = {};
@@ -246,4 +281,17 @@ function drawSpiral(data_10min) {
         .attr("startOffset", function(d) {
             return ((d.linePer / spiralLength) * 100) + "%";
         });
+    // g.selectAll("rect")
+    //     .on('mouseover', function(d) {
+    //         d3.select("#spiralLine").selectAll("rect")
+    //             .style("opacity", 0.3);
+    //         d3.select(this)
+    //             .text(this.value)
+    //             .style("opacity", 1);
+    //     })
+    //     .on('mousemove', function(d) {})
+    //     .on('mouseout', function(d) {
+    //         d3.select("#spiralLine").selectAll("rect")
+    //             .style("opacity", 1);
+    //     });
 }

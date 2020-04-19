@@ -60,7 +60,7 @@ function sendWeather(data) {
 
 // // data是weather的数据 Data是trip的数据
 function handleWeaSta(data, Data) {
-    console.log(data);
+    //console.log(data);
     // var nest = d3.nest().key(function(d) {
     //         return new Date(d.start_time).getDate();
     //     })
@@ -126,50 +126,50 @@ function handleWeaSta(data, Data) {
     var RainIndex, WindIndex, TemIndex;
 
     data.forEach(function(d) {
-        // console.log("xx");
-        // 都有天气事件或有降水量
-        //console.log(d.Events);
-        RainIndex = -1;
-        WindIndex = 0;
-        TemIndex = 0;
-        if (d.Events != null || d.Precipitation_In > 0) {
+            // console.log("xx");
+            // 都有天气事件或有降水量
+            //console.log(d.Events);
+            RainIndex = -1;
+            WindIndex = 0;
+            TemIndex = 0;
+            if (d.Events != null || d.Precipitation_In > 0) {
 
-            // 小雨 RainIndex=1
-            if (0 <= d.Precipitation_In && d.Precipitation_In <= 0.39) RainIndex = 1;
-            // 中雨 RainIndex=2
-            else if (d.Precipitation_In > 0.39 && d.Precipitation_In <= 0.98) RainIndex = 2;
-            // 大雨，RainIndex=3
-            else if (d.Precipitation_In > 0.98 && d.Precipitation_In <= 1.96) RainIndex = 3;
-            // 暴雨，RainIndex=4
-            else if (d.Precipitation_In > 1.96) RainIndex = 4;
-        }
+                // 小雨 RainIndex=1
+                if (0 <= d.Precipitation_In && d.Precipitation_In <= 0.39) RainIndex = 1;
+                // 中雨 RainIndex=2
+                else if (d.Precipitation_In > 0.39 && d.Precipitation_In <= 0.98) RainIndex = 2;
+                // 大雨，RainIndex=3
+                else if (d.Precipitation_In > 0.98 && d.Precipitation_In <= 1.96) RainIndex = 3;
+                // 暴雨，RainIndex=4
+                else if (d.Precipitation_In > 1.96) RainIndex = 4;
+            }
 
-        // 7、8级风骑车不安全;6级风没体力顶不动,5级风骑车尚可
-        // 0-5级风 WindIndex=5
-        if (d.Max_Gust_Speed_MPH <= 25 || d.Max_Gust_Speed_MPH == "-") WindIndex = 5;
-        // 6级风 WindIndex=6
-        else if (d.Max_Gust_Speed_MPH > 25 && d.Max_Gust_Speed_MPH <= 31) WindIndex = 6;
-        // 7风 树枝摇动 WindIndex=7
-        else if (d.Max_Gust_Speed_MPH > 31 && d.Max_Gust_Speed_MPH <= 38) WindIndex = 7;
-        // 8风，WindIndex=8
-        else if (d.Max_Gust_Speed_MPH > 38 && d.Max_Gust_Speed_MPH <= 46) WindIndex = 8;
-        // 9风，WindIndex=9
-        else if (d.Max_Gust_Speed_MPH > 47) WindIndex = 9;
+            // 7、8级风骑车不安全;6级风没体力顶不动,5级风骑车尚可
+            // 0-5级风 WindIndex=5
+            if (d.Max_Gust_Speed_MPH <= 25 || d.Max_Gust_Speed_MPH == "-") WindIndex = 5;
+            // 6级风 WindIndex=6
+            else if (d.Max_Gust_Speed_MPH > 25 && d.Max_Gust_Speed_MPH <= 31) WindIndex = 6;
+            // 7风 树枝摇动 WindIndex=7
+            else if (d.Max_Gust_Speed_MPH > 31 && d.Max_Gust_Speed_MPH <= 38) WindIndex = 7;
+            // 8风，WindIndex=8
+            else if (d.Max_Gust_Speed_MPH > 38 && d.Max_Gust_Speed_MPH <= 46) WindIndex = 8;
+            // 9风，WindIndex=9
+            else if (d.Max_Gust_Speed_MPH > 47) WindIndex = 9;
 
-        // 10>平均温度>0℃ temIndex=9
-        if (d.Mean_Temperature_F <= 50) TemIndex = 10;
-        // 20>平均温度>10℃  temIndex=10
-        else if (d.Mean_Temperature_F > 50 && d.Mean_Temperature_F <= 68) TemIndex = 11;
-        // 平均温度>20℃  temIndex=11
-        else if (d.Mean_Temperature_F > 68) TemIndex = 12;
-        // console.log(RainIndex);
-        // console.log(WindIndex);
-        // 没下雨并且风小,则RainIndex=0
-        if (RainIndex == -1 && WindIndex == 5) RainIndex = 0;
-        weatherIndex.push({ date: new Date(d.Date).getDate(), rainIndex: RainIndex, windIndex: WindIndex, temIndex: TemIndex });
-        // console.log(RainIndex);
-    })
-    console.log(weatherIndex);
+            // 10>平均温度>0℃ temIndex=9
+            if (d.Mean_Temperature_F <= 50) TemIndex = 10;
+            // 20>平均温度>10℃  temIndex=10
+            else if (d.Mean_Temperature_F > 50 && d.Mean_Temperature_F <= 68) TemIndex = 11;
+            // 平均温度>20℃  temIndex=11
+            else if (d.Mean_Temperature_F > 68) TemIndex = 12;
+            // console.log(RainIndex);
+            // console.log(WindIndex);
+            // 没下雨并且风小,则RainIndex=0
+            if (RainIndex == -1 && WindIndex == 5) RainIndex = 0;
+            weatherIndex.push({ date: new Date(d.Date).getDate(), rainIndex: RainIndex, windIndex: WindIndex, temIndex: TemIndex });
+            // console.log(RainIndex);
+        })
+        //console.log(weatherIndex);
 
 
     // 将当天总使用量和Index 存入fromInfo
@@ -204,22 +204,22 @@ function handleWeaSta(data, Data) {
         })
         // 加totalSum Index
     fromInfo.forEach(function(d) {
-        d.totalSum = d.fromSum;
-        toInfo.forEach(function(i) {
-            if (d.date == i.date && d.fromID == i.toID) {
-                d.totalSum = d.fromSum + i.toSum;
-            }
+            d.totalSum = d.fromSum;
+            toInfo.forEach(function(i) {
+                if (d.date == i.date && d.fromID == i.toID) {
+                    d.totalSum = d.fromSum + i.toSum;
+                }
+            })
+            weatherIndex.forEach(function(j) {
+                if (d.date == j.date) {
+                    d.rain = j.rainIndex;
+                    d.wind = j.windIndex;
+                    d.tem = j.temIndex;
+                }
+            })
         })
-        weatherIndex.forEach(function(j) {
-            if (d.date == j.date) {
-                d.rain = j.rainIndex;
-                d.wind = j.windIndex;
-                d.tem = j.temIndex;
-            }
-        })
-    })
-    console.log("fromInfo");
-    console.log(fromInfo);
+        // console.log("fromInfo");
+        // console.log(fromInfo);
 
     // 按ID排序，为了根据wind rain tem得到各个天气情况的使用次数
     var nest = d3.nest()
@@ -235,8 +235,8 @@ function handleWeaSta(data, Data) {
         .key(function(d) { return d.tem; })
     var temNest = nest.entries(fromInfo);
 
-    console.log("windNest");
-    console.log(windNest);
+    // console.log("windNest");
+    // console.log(windNest);
     // Count[]存储ID ，天气系数，两者对应的车站使用次数
     var Count = [];
     var wSum = 0;
@@ -332,10 +332,10 @@ function handleWeaSta(data, Data) {
         }
     })
     drawWeather(viewData);
-    console.log("CountNest");
-    console.log(CountNest);
-    console.log("viewData");
-    console.log(viewData);
+    // console.log("CountNest");
+    // console.log(CountNest);
+    // console.log("viewData");
+    // console.log(viewData);
 }
 
 
@@ -387,7 +387,7 @@ function drawWeather(data) {
         .attr("transform", "translate(" + gridSize + ",0)");
     // 颜色标签
     var legend_g = svg.append("g")
-        .attr("transform", "translate(30,340)")
+        .attr("transform", "translate(30,332)")
 
     var index_Labels = indexLabel.selectAll(".indexLabel")
         .data(showindex)
@@ -422,7 +422,7 @@ function drawWeather(data) {
         })
         .text(function(d) { return d; })
         // 2.2影响标签的起始位置，*后面应该是影响两个标签的间距
-        .attr("y", function(d, i) { return (i + 2.2) * (gridSize + 5); })
+        .attr("y", function(d, i) { return (i + 2.2) * (gridSize + 5.4); })
         .attr("x", 14)
         // .on("click", function(d, i) {
         //     d3.select("#section_date").text("2016/1/" + d);
@@ -462,7 +462,7 @@ function drawWeather(data) {
         .attr("x", function(d, i) {
             // console.log("d.Index");
             // console.log(d.Index);
-            return (d.Index + 7.8) * 2;
+            return (d.Index + 8.4) * 1.93;
         })
         .attr("class", function(d) {
             if (d.sum === null)
@@ -526,7 +526,7 @@ function drawWeather(data) {
         .attr("x", function(d, i) {
             return (i + 1) * gridSize * 17 / 6;
         })
-        .attr("y", 14)
+        .attr("y", 12)
         .style({
             "fill": "#696969",
 
