@@ -2,13 +2,47 @@
             position: absolute;
             top: 16.5%;
             left: 1%;
-            width: 19%;
-            height: 55%;
+            width: 20%;
+            height: 42%;
+            background-color: #EEEEEE;
+            border-radius: 10px;
+            /* 设置 h1、h2、h3 元素的文本对齐方式 */
+            text-align: center;
+            /* cursor:default	默认光标（通常是一个箭头） */
+            /* cursor: default; */
+            align-content: center;
+            overflow: hidden;
         }
         
         #wordCloudView {
             position: absolute;
             height: 100%;
             width: 100%;
-            /* background-color: #FFFFFF; */
+        }
+        
+        .name_message {
+            position: absolute;
+            text-decoration: none;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            ;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        /* #cloud_div {
+            height: 150px;
+            width: 160px;
+        }*/
+        
+        #cloud_div a {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            font-family: Microsoft YaHei;
+            /* color: #fff; */
+            font-weight: bold;
+            text-decoration: none;
+            padding: 3px 6px;
         }

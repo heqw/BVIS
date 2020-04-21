@@ -1,9 +1,11 @@
         #timeLine {
             position: absolute;
-            top: 7%;
+            top: 10%;
             left: 79%;
-            height: 30%;
-            width: 19%;
+            height: 33%;
+            width: 20%;
+            background-color: #EEEEEE;
+            border-radius: 10px;
         }
         
         #timeLineView {

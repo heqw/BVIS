@@ -316,7 +316,7 @@ function drawMap(station, dayTripInfo) {
                     // // Math.floor(trips[i].tripsSum / 4 有的是0，所以+1保证非零
                     // "properties": { "radius": (Math.floor(trips[i].tripsSum / 7) + trips[i].tripsSum * 0.3) * j / count, "color": colors[Math.floor(trips[i].tripsSum / 4)] },
                     "properties": {
-                        "radius": (Math.floor(trips[i].tripsSum / 7) + trips[i].tripsSum * 0.3),
+                        "radius": (Math.floor(trips[i].tripsSum / 16) + trips[i].tripsSum * 0.3),
                         "color": colors[Math.floor(trips[i].tripsSum / 4)]
                     },
                 });
@@ -508,7 +508,7 @@ function drawMap(station, dayTripInfo) {
         function animateMarker(timestamp) {
             // Update the data to a new position based on the animation timestamp. The
             // divisor in the expression `timestamp / 1000` controls the animation speed.
-            map.getSource('chart-points').setData(buildPoints(timestamp / 10000));
+            map.getSource('chart-points').setData(buildPoints(timestamp / 8000));
 
             // Request the next frame of the animation.
             requestAnimationFrame(animateMarker);

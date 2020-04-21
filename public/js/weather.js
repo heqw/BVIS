@@ -334,8 +334,8 @@ function handleWeaSta(data, Data) {
     drawWeather(viewData);
     // console.log("CountNest");
     // console.log(CountNest);
-    // console.log("viewData");
-    // console.log(viewData);
+    console.log("viewData");
+    console.log(viewData);
 }
 
 
@@ -387,7 +387,7 @@ function drawWeather(data) {
         .attr("transform", "translate(" + gridSize + ",0)");
     // 颜色标签
     var legend_g = svg.append("g")
-        .attr("transform", "translate(30,332)")
+        .attr("transform", "translate(30,305)")
 
     var index_Labels = indexLabel.selectAll(".indexLabel")
         .data(showindex)
@@ -399,7 +399,7 @@ function drawWeather(data) {
         })
         .text(function(d) { return d; })
         .attr("x", function(d, i) { return (i + 1.8) * (gridSize + 5); })
-        .attr("y", 30)
+        .attr("y", 38)
         // .on("click", function(d, i) {
         //     d3.select("#section_date").text("2016/1/" + d);
         //     section_id_date(section_id, new Date(2016, 0, d, 0, 0, 0));
@@ -422,7 +422,7 @@ function drawWeather(data) {
         })
         .text(function(d) { return d; })
         // 2.2影响标签的起始位置，*后面应该是影响两个标签的间距
-        .attr("y", function(d, i) { return (i + 2.2) * (gridSize + 5.4); })
+        .attr("y", function(d, i) { return (i + 3) * (gridSize + 3); })
         .attr("x", 14)
         // .on("click", function(d, i) {
         //     d3.select("#section_date").text("2016/1/" + d);
@@ -457,12 +457,12 @@ function drawWeather(data) {
         .attr("y", function(d, i) {
             // console.log("d.sort");
             // console.log(d.sort);
-            return (d.sort + 1) * 20 + 5;
+            return d.sort * 16.5 + 35;
         })
         .attr("x", function(d, i) {
             // console.log("d.Index");
             // console.log(d.Index);
-            return (d.Index + 8.4) * 1.93;
+            return d.Index * 18.6 + 14;
         })
         .attr("class", function(d) {
             if (d.sum === null)
@@ -497,7 +497,8 @@ function drawWeather(data) {
     //         "fill": "#ffffff",
     //         "text-anchor": "middle"
     //     });
-    var color_scale = ["#40E0D0", "#23D561", "#9CD523", "#FFBF3A", "#FB8C00", "#FF5252"];
+    var color_scale = ["#FFEA6B", "#F7B65A", "#EB8942", "#E35B2E", "#9D442C", "#493432"];
+    // var color_scale = ["#40E0D0", "#23D561", "#9CD523", "#FFBF3A", "#FB8C00", "#FF5252"];
     // 横线的颜色注释
     legend_g.selectAll(".colorLegend")
         .data(color_scale)
@@ -526,7 +527,7 @@ function drawWeather(data) {
         .attr("x", function(d, i) {
             return (i + 1) * gridSize * 17 / 6;
         })
-        .attr("y", 12)
+        .attr("y", 18)
         .style({
             "fill": "#696969",
 

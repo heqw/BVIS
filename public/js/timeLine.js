@@ -96,14 +96,14 @@ function handleData(data, weatherdata) {
             // 都有天气事件或有降水量
             if (d.Event != null || d.Precipitation_In != 0) {
                 // 小雨 RainIndex=1
-                if (d.Precipitation_In <= 0.39) rain[i] = "小雨";
+                if (d.Precipitation_In <= 0.39) rain[i] = "小";
                 // 中雨 RainIndex=2
-                else if (d.Precipitation_In > 0.39 && d.Precipitation_In <= 0.98) rain[i] = "中雨";
+                else if (d.Precipitation_In > 0.39 && d.Precipitation_In <= 0.98) rain[i] = "中";
                 // 大雨，RainIndex=3
-                else if (d.Precipitation_In > 0.98 && d.Precipitation_In <= 1.96) rain[i] = "大雨";
+                else if (d.Precipitation_In > 0.98 && d.Precipitation_In <= 1.96) rain[i] = "大";
                 // 暴雨，RainIndex=4
-                else if (d.Precipitation_In > 1.96) rain[i] = "暴雨";
-            } else rain[i] = "无雨";
+                else if (d.Precipitation_In > 1.96) rain[i] = "暴";
+            } else rain[i] = "无";
             i++;
             // 7、8级风骑车不安全;6级风没体力顶不动,5级风骑车尚可
             // 0-5级风 WindIndex=5
@@ -123,17 +123,17 @@ function handleData(data, weatherdata) {
     drawtime(userData, wind, rain);
     // drawtime(memberData);
     // drawtime(shortData);
-    console.log(userData);
+    //console.log(userData);
     // console.log(memberData);
     // console.log(shortData);
 }
 
 function drawtime(data, wind, rain) {
     //console.log("time1");
-    var color = ["#FFD700", "#C47F85"];
+    var color = ["#FFD700", "#B57766"];
     var time_line_wh = $("#timeLineView");
 
-    var margin = { top: 20, right: 0, bottom: 20, left: 0 },
+    var margin = { top: 20, right: 0, bottom: 40, left: 0 },
         width = time_line_wh.width() - margin.left - margin.right,
         height = time_line_wh.height() - margin.top - margin.bottom;
 
@@ -349,7 +349,7 @@ function drawtime(data, wind, rain) {
         })
         .attr("daySum", function(d) {
             d.forEach(function(s) {
-                console.log(s.daySum);
+                //console.log(s.daySum);
                 return s.daySum;
             })
         })
@@ -362,7 +362,7 @@ function drawtime(data, wind, rain) {
             "position": "absolute",
             "z-index": "999",
             "right": "10px",
-            "top": "10px"
+            "top": "30px"
         })
         .selectAll("label label-default legend_label")
         .data(labels)
@@ -406,10 +406,10 @@ function drawtime(data, wind, rain) {
             return d;
         })
         .attr("fill", "black")
-        .attr("font-size", "10px")
+        .attr("font-size", "8px")
         .attr("x", function(d, i) {
             // return i * (100 / weather.length);
-            return i * 33;
+            return i * 36;
         })
         .attr("y", function(d) {
             return 165;
@@ -422,10 +422,10 @@ function drawtime(data, wind, rain) {
             return d;
         })
         .attr("fill", "black")
-        .attr("font-size", "10px")
+        .attr("font-size", "8px")
         .attr("x", function(d, i) {
             // return i * (100 / weather.length);
-            return i * 33;
+            return i * 35;
         })
         .attr("y", function(d) {
             return 180;

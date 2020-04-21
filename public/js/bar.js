@@ -299,7 +299,7 @@ function drawBar(data) {
         .attr("width", width)
         .attr("height", height)
         .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", "translate(" + margin.left + "," + margin.top + 13 + ")");
 
 
 
@@ -412,8 +412,8 @@ function drawBar(data) {
         .style({
             "position": "absolute",
             "z-index": "999",
-            "right": "10px",
-            "top": "10px"
+            "right": "5px",
+            "top": "15px"
         })
         .selectAll("label label-default legend_label")
         .data(labels)

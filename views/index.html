@@ -35,7 +35,7 @@
         
         #map {
             position: absolute;
-            top: 7%;
+            top: 6.8%;
             left: 22%;
             width: 56%;
             height: 62%;
@@ -43,10 +43,10 @@
         
         #bar {
             position: absolute;
-            top: 72%;
+            top: 70%;
             left: 22%;
             width: 56%;
-            height: 26%;
+            height: 25%;
             /* bottom: 1px; */
         }
         
@@ -54,15 +54,16 @@
             /* position: absolute; */
             height: 100%;
             width: 100%;
-            /* background-color: #FFFFFF; */
+            background-color: #EEEEEE;
+            border-radius: 10px;
         }
         
         #weather {
             position: absolute;
-            top: 43%;
-            left: 78.5%;
-            width: 21.5%;
-            height: 55%;
+            top: 45%;
+            left: 79%;
+            width: 20%;
+            height: 53%;
             /* bottom: 1px; */
         }
         
@@ -70,7 +71,8 @@
             /* position: absolute; */
             height: 100%;
             width: 100%;
-            /* background-color: #FFFFFF; */
+            background-color: #EEEEEE;
+            border-radius: 10px;
         }
         
         .tooltip {
@@ -97,8 +99,7 @@
             fill: rgb(0, 0, 0);
             font-size: 10px;
         }
-        
-        .q5-6 {
+        /* .q5-6 {
             fill: #FF5252
         }
         
@@ -120,21 +121,47 @@
         
         .q0-6 {
             fill: #40E0D0
+        } */
+        
+        .q5-6 {
+            fill: #493432
+        }
+        
+        .q4-6 {
+            fill: #9D442C
+        }
+        
+        .q3-6 {
+            fill: #E35B2E
+        }
+        
+        .q2-6 {
+            fill: #EB8942
+        }
+        
+        .q1-6 {
+            fill: #F7B65A
+        }
+        
+        .q0-6 {
+            fill: #FFEA6B
         }
         
         #spiralLine {
             position: absolute;
             top: 60%;
-            width: 22%;
-            height: 40%;
+            width: 20%;
+            height: 38%;
             left: 1%;
+            background-color: #EEEEEE;
+            border-radius: 10px;
         }
         
         #headTitle {
             /* font-size: 2px; */
             position: absolute;
             left: 30%;
-            /* top: 1%; */
+            top: 3%;
         }
         
         #calendar {
@@ -142,7 +169,7 @@
             top: 10%;
             left: 1%;
             width: 20%;
-            height: 20%;
+            height: 10%;
         }
         
         .leftName {
@@ -160,15 +187,15 @@
             
         } */
         
-        h1 {
-            font-size: 25px;
+        .titleName {
+            font-size: 22px;
         }
         
         #wholeView {
             /* position: fixed; */
             width: 100%;
-            height: 650px;
-            /* background-color: rgb(189, 189, 189); */
+            height: 632px;
+            background-color: #FFFFFF;
         }
     </style>
 
@@ -177,16 +204,17 @@
 <body>
     <div id="wholeView">
         <div id=headTitle>
-            <h1>共享单车数据的用户时空行为特征可视分析系统</h1>
+            <div class="titleName">共享单车数据的用户时空行为特征可视分析系统</div>
         </div>
 
         <div id="wordCloud">
-            <div class="leftName">会员单日站点热度</div>
+            <div class="leftName">单日站点热度</div>
             <div id="wordCloudView"></div>
         </div>
 
         <div id="timeLine">
-            <div class="rightName">会员与普通用户一周骑行次数分布</div>
+            <!-- <div class="rightName">会员与普通用户一周骑行次数分布</div> -->
+            <div class="rightName">一周骑行次数分布</div>
             <div id="timeLineView"></div>
         </div>
 
@@ -196,23 +224,23 @@
         </div>
 
         <div id="bar">
-            <div class="barName">会员单日不同时间段使用次数最高站点</div>
+            <div class="barName">热点OD时间分布</div>
             <div id="barView"></div>
         </div>
 
         <div id="spiralLine">
-            <div class="leftName">会员单日骑行时间和次数分布</div>
+            <div class="leftName">单日骑行时间分布</div>
             <div id="spiralLineView"></div>
         </div>
 
         <div id="weather">
-            <div class="rightName">会员单月使用次数较高的站点受天气影响</div>
+            <div class="rightName">单月站点使用与天气因素</div>
             <div id="weatherView"></div>
         </div>
 
         <div id="calendar">
             <div class="input-append date form_datetime">
-                <input size="16" type="text" value="" name="startTime" readonly>
+                <input size="18" type="text" value="" name="startTime" readonly>
                 <span class="add-on">
                     <i class="icon-th"></i></span>
             </div>

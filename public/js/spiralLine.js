@@ -122,7 +122,7 @@ function drawSpiral(data_10min) {
     // start = 0,stop = 2.25
     var radius = d3.scale.linear()
         .domain([start, stop])
-        .range([20, r + 3]);
+        .range([20, r + 20]);
 
 
     // 设置svg画布
@@ -133,7 +133,7 @@ function drawSpiral(data_10min) {
         .attr("transform", "translate(0," + 0 + ")");
 
     var g = svg.append("g")
-        .attr("transform", "translate(" + width / 2.3 + "," + height / 1.8 + ")");
+        .attr("transform", "translate(" + width / 2.1 + "," + height / 1.8 + ")");
 
     // .range(start,stop,step)
     // 以start为起点，以stop为终点，以step为前后项的差值 等差数列
@@ -234,6 +234,8 @@ function drawSpiral(data_10min) {
             if (minute == '0') minute = "00";
             var x = d3.select(this).attr("x");
             var y = d3.select(this).attr("y");
+            if (x > 90) x -= 30;
+            else if (x < 20) x += 30;
             var tip = g.append("text")
                 .attr("id", "messenge")
                 .text("时间" + hour + ":" + minute + " " + "次数：" + show)
@@ -277,7 +279,7 @@ function drawSpiral(data_10min) {
             return tF(d.date);
         })
         .attr("xlink:href", "#spiral")
-        .style("fill", "#2F4F4F")
+        .style("fill", "#B57766")
         .attr("startOffset", function(d) {
             return ((d.linePer / spiralLength) * 100) + "%";
         });
