@@ -108,7 +108,7 @@ function figureTime(data) {
     // 不能直接按sort后的顺序直接画要不然画出来的效果是字体依次减小颜色一次变淡
     var sort15 = [];
     word.forEach(function(d) {
-        for (i = 0; i < 15; i++) {
+        for (i = 0; i < 25; i++) {
             if (d.key == wordData[i].key)
                 sort15.push({ key: d.key, useTime: d.useTime, station_id: d.station_id });
         }
@@ -225,15 +225,17 @@ function draw(drawData) {
                     map.flyTo({ center: s.geometry.coordinates });
                     if (mainChart.Msg_pop)
                         mainChart.Msg_pop.remove();
+                    pro = "NAME:" + s.properties.description + '<p>' + "ID:" + s.properties.station_id;
                     mainChart.Msg_pop = new mapboxgl.Popup()
                         .setLngLat(s.geometry.coordinates)
-                        .setHTML(s.properties.description)
+                        .setHTML(pro)
                         .addTo(map);
                 }
             });
         });
 
-    var radius = width / 3;
+    // var radius = width / 2.5;
+    var radius = 100;
     var dtr = Math.PI / 180;
     var d = 300;
 
@@ -311,10 +313,12 @@ function draw(drawData) {
         // console.log(oEvent.clientY);
         // clientX 设置或获取鼠标指针位置相对于窗口客户区域的 x 坐标，其中客户区域不包括窗口自身的控件和滚动条
         mouseX = oEvent.clientX - (oDiv.offsetLeft + oDiv.offsetWidth / 2);
-        mouseY = oEvent.clientY - (oDiv.offsetTop + oDiv.offsetHeight / 2);
+        // mouseY－225，球才能从下往上翻
+        mouseY = oEvent.clientY - (oDiv.offsetTop + oDiv.offsetHeight / 2) - 225;
         // 如果想改变他的速度的话，你就改变：mouseX/=5;mouseY/=5;后面数越大，速度越慢
         mouseX /= 5;
         mouseY /= 5;
+        console.log(mouseX, mouseY);
     };
     // oDiv.οnmοusemοve = function(event) {
     //     console.log(event);
@@ -355,8 +359,8 @@ function draw(drawData) {
 
         var c = 0;
         sineCosine(a, b, c);
-        console.log(a);
-        console.log(active);
+        // console.log(a);
+        // console.log(active);
         for (var j = 0; j < mcList.length; j++) {
             // 绕x轴旋转？
             var rx1 = mcList[j].cx;
@@ -483,4 +487,15 @@ function draw(drawData) {
         cc = Math.cos(c * dtr);
 
     }
+    // d3.select("#headTitle").append("div")
+    //     .attr("class", "header_left")
+    //     .append("svg")
+    //     .attr("width", 1000 * 0.4 - 10)
+    //     .attr("height", 38)
+    //     .append("image")
+    //     .attr("x", 0)
+    //     .attr("y", 0)
+    //     .attr("width", 1000 * 0.4 - 10)
+    //     .attr("height", 38)
+    //     .attr("xlink:href", "public/images/title.png");
 }

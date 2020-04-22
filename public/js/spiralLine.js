@@ -279,7 +279,7 @@ function drawSpiral(data_10min) {
             return tF(d.date);
         })
         .attr("xlink:href", "#spiral")
-        .style("fill", "#B57766")
+        .style("fill", "#000000")
         .attr("startOffset", function(d) {
             return ((d.linePer / spiralLength) * 100) + "%";
         });

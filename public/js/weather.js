@@ -129,7 +129,7 @@ function handleWeaSta(data, Data) {
             // console.log("xx");
             // 都有天气事件或有降水量
             //console.log(d.Events);
-            RainIndex = -1;
+            RainIndex = 0;
             WindIndex = 0;
             TemIndex = 0;
             if (d.Events != null || d.Precipitation_In > 0) {
@@ -165,7 +165,7 @@ function handleWeaSta(data, Data) {
             // console.log(RainIndex);
             // console.log(WindIndex);
             // 没下雨并且风小,则RainIndex=0
-            if (RainIndex == -1 && WindIndex == 5) RainIndex = 0;
+            // if (RainIndex == -1 && WindIndex == 5) RainIndex = 0;
             weatherIndex.push({ date: new Date(d.Date).getDate(), rainIndex: RainIndex, windIndex: WindIndex, temIndex: TemIndex });
             // console.log(RainIndex);
         })
@@ -254,6 +254,7 @@ function handleWeaSta(data, Data) {
         }
 
     })
+    console.log(Count);
     rainNest.forEach(function(d) {
         for (var i = 0; i < d.values.length; i++) {
             wSum = 0;
