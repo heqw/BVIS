@@ -18,12 +18,20 @@ var map = new mapboxgl.Map({
 //console.log(stationInfo);
 
 var mainChart = {};
-// var dayTripInfo;
-DrawStation();
+//flag判断日期数据来源
+var flag = "first";
+// var hour, time, minute;
+mainChart.map_view = {
+    "OD": true,
+    "heatmap": false
+};
+DrawStation(flag, a.getdate);
+// DrawStation();
 
-function DrawStation() {
+function DrawStation(flag, date) {
+    console.log(flag);
     // var daytripInfo;
-
+    // 请求的是所选当天的trip数据
     $.ajax({
         url: "http://localhost:3000/spiralLineData",
         dataType: 'json',
@@ -44,7 +52,35 @@ function DrawStation() {
         success: function(Info, textStatus) {
             // var daytripInfo = Info; console.log(daytripInfo);
             // console.log(Info);
-            senddaytripInfo(Info);
+            var tripInfo = [];
+            if (flag == "spiral") {
+                mainChart.spiralHour = date.getHours();
+                mainChart.spiralMinute = date.getMinutes();
+                if (mainChart.spiralMinute == '0') mainChart.spiralMinute = "00";
+                Info.forEach(function(d) {
+                        //trips数据的时间
+                        var time = new Date(d.start_time);
+                        // console.log(time);
+                        var hour = time.getHours() - 8;
+                        if (hour < 0) hour += 24;
+                        var minute = time.getMinutes();
+                        if (mainChart.spiralHour == hour && minute >= mainChart.spiralMinute &&
+                            minute <= (mainChart.spiralMinute + 9) && d.user_type == "Member") {
+                            tripInfo.push({ from_station_id: d.from_station_id, to_station_id: d.to_station_id });
+                            // odFrom: d.from_station_id, odTo: d.to_station_id, odSum: sum
+                        }
+                        // console.log("spiral时间 if里");
+                        // console.log(mainChart.spiralHour);
+                        // console.log(mainChart.spiralMinute);
+                    })
+                    // console.log("spiral时间");
+                    // console.log(mainChart.spiralHour);
+                    // console.log(mainChart.spiralMinute);
+                senddaytripInfo(tripInfo, flag);
+                console.log(tripInfo);
+            } else senddaytripInfo(Info, flag);
+            console.log(Info);
+
         },
         complete: function() {},
         error: function() {}
@@ -53,8 +89,8 @@ function DrawStation() {
     //console.log(daytripInfo);
 }
 
-function senddaytripInfo(In) {
-
+function senddaytripInfo(In, flag) {
+    // 请求的是station的数据，为了获得站点经纬度那些信息
     $.ajax({
         url: "http://localhost:3000/stationData",
         dataType: 'json',
@@ -68,7 +104,8 @@ function senddaytripInfo(In) {
         //任意命名的，在这个函数有用到。参数值是在Ajax提交成功后所返回的内容
         success: function(mapInfo, textStatus) {
             //stationInfo=mapInfo;
-            drawMap(mapInfo, In); //console.log(daytripInfo);
+            drawMap(mapInfo, In, flag); //console.log(daytripInfo);
+            initHeatMap(mapInfo, In);
         },
         complete: function() {},
         error: function() { console.log("maperror") }
@@ -77,8 +114,9 @@ function senddaytripInfo(In) {
 
 }
 
-function drawMap(station, dayTripInfo) {
-    //console.log(station);
+function drawMap(station, dayTripInfo, flag) {
+    console.log("骑行数据");
+    console.log(dayTripInfo);
     //console.log(typeof(station));
     // stationData = station;
 
@@ -89,6 +127,67 @@ function drawMap(station, dayTripInfo) {
     var trips = [];
     // 存储O的long lat,D的long lat,绘制路线
     var od = [];
+    var limit = 2;
+    if (flag == "spiral") {
+        limit = 0;
+        // map.removeLayer("station");
+        // map.removeLayer('route');
+        // map.removeLayer('chart-point');
+        // // // map.removeLayer('heatMap');
+        // // map.removeSource("chart-lines");
+        // // map.removeSource("station_source");
+        // map.removeSource('chart-points');
+        map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v9',
+            // style: 'mapbox://styles/mapbox/streets-v9',
+
+            //A zoom level determines how much of the world is visible on a map，缩放级别
+            zoom: 11.7,
+            //Default map center in longitude and latitude.经度 纬度
+            center: [-122.319407, 47.623748],
+            //pitch in degrees倾斜度
+            pitch: 40
+        });
+
+        d3.selectAll('#time_div').remove();
+        //map添加一个div,作用？应该是左下角那个透明的颜色
+        var main_time = d3.select("#map")
+            .append("div")
+            .attr("id", "time_div")
+            .style({
+                "position": "absolute",
+                "pointer-events": "none",
+                "z-index": "999",
+                "bottom": "2%",
+                "left": '2%'
+            })
+            .attr("width", 100)
+            .attr("height", 30);
+        //该div添加一个 a?，显示时间？  
+        main_time.append("a")
+            .attr("id", "map_date")
+            .attr("align", "center")
+            .style("display", "block")
+            .text(mainChart.spiralHour + ":" + mainChart.spiralMinute)
+            .style({
+                "font-size": '30px',
+                "opacity": 0.6,
+                // #ffffff白色
+                "color": "#ffffff",
+                "text-align": "center",
+            });
+
+
+
+
+        // map.setLayoutProperty('station', 'visibility', 'none');
+        // map.setLayoutProperty('route', 'visibility', 'none');
+        // map.setLayoutProperty('chart-points', 'visibility', 'none');
+        // map.setLayoutProperty('heatMap', 'visibility', 'none');
+    }
+    console.log("limit");
+    console.log(limit);
     //给每一个单车数据添加feature
     mainChart.stationFeatures = [];
 
@@ -194,14 +293,16 @@ function drawMap(station, dayTripInfo) {
             }
         }
     });
-    //  console.log("trips:");console.log(trips);
+    console.log("trips:");
+    console.log(trips);
 
 
     //data_point是车站的集合？画站点位置用
     mainChart.data_point = {
         "type": "FeatureCollection", //则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
         "features": mainChart.stationFeatures
-    }; //console.log(stationFeatures);
+    };
+    console.log(mainChart.data_point);
 
 
 
@@ -215,7 +316,7 @@ function drawMap(station, dayTripInfo) {
         var features = [];
         var curveness = 0.3;
         for (var i = 0; i < trips.length; i++) {
-            if (trips[i].tripsSum > 2) {
+            if (trips[i].tripsSum > limit) {
                 var startLong = Number(trips[i].fromLong);
                 var startLat = Number(trips[i].fromLat);
                 var endLong = Number(trips[i].toLong);
@@ -241,12 +342,16 @@ function drawMap(station, dayTripInfo) {
                         "coordinates": points,
                     },
                     "properties": {
-                        "color": colors[Math.floor(trips[i].tripsSum / 4)],
-                        "line-width": trips[i].tripsSum / 2
+                        "color": colors[Math.floor(trips[i].tripsSum / 4) + Math.abs(limit - 2)],
+                        "line-width": trips[i].tripsSum / 2,
+                        "fromStation": trips[i].tripsFrom,
+                        "toStation": trips[i].tripsTo
                     },
                 }); //console.log(Math.floor(trips[i].tripsSum / 4));
             }
         }
+        console.log("features");
+        console.log(features);
         return features;
     };
 
@@ -259,13 +364,14 @@ function drawMap(station, dayTripInfo) {
         })
         // 画贝塞尔的动态点
     var buildPoints = function(time) {
+        // console.log("diandiandiandiandian");
         var features = [];
         var curveness = 0.3;
         // console.log("time");
         // console.log(time);
 
         for (var i = 0; i < trips.length; i++) {
-            if (trips[i].tripsSum > 2) {
+            if (trips[i].tripsSum > limit) {
                 N++;
                 var startLong = Number(trips[i].fromLong);
                 var startLat = Number(trips[i].fromLat);
@@ -395,6 +501,9 @@ function drawMap(station, dayTripInfo) {
             //地图缩放的最小比列
             "minzoom": 2,
             "type": "circle",
+            "layout": {
+                'visibility': 'visible'
+            },
             "paint": {
                 //点的属性
                 "circle-radius": 4,
@@ -431,11 +540,16 @@ function drawMap(station, dayTripInfo) {
             /* geojson类型资源 */
             "data": data_line
         });
+        console.log("data_line");
+        console.log(data_line);
 
         map.addLayer({
             "id": "route",
             "type": "line",
             "source": "chart-lines",
+            "layout": {
+                'visibility': 'visible'
+            },
             "layout": {
                 "line-join": "round",
                 "line-cap": "round"
@@ -477,7 +591,8 @@ function drawMap(station, dayTripInfo) {
         //     }
         // });
 
-
+        console.log("buildPoints");
+        console.log(buildPoints(0));
         // 加载贝塞尔曲线动态点
         map.addSource("chart-points", {
             "type": "geojson",
@@ -487,11 +602,16 @@ function drawMap(station, dayTripInfo) {
                 buildPoints(0)
 
         });
+        // console.log("chart-points");
+        // console.log(chart - points);
         map.addLayer({
-            "id": "chart-points",
+            "id": "chart-point",
             "type": "circle",
             /* circle类型表示一个圆，一般比较小 */
             "source": "chart-points",
+            "layout": {
+                'visibility': 'visible'
+            },
             "paint": {
                 "circle-radius": ["get", "radius"],
                 "circle-color": ["get", "color"],
@@ -505,17 +625,23 @@ function drawMap(station, dayTripInfo) {
             }
         });
 
+        var t = 0;
+        // console.log(chart - points);
+
         function animateMarker(timestamp) {
+            // console.log(buildPoints(timestamp / 8000));
             // Update the data to a new position based on the animation timestamp. The
             // divisor in the expression `timestamp / 1000` controls the animation speed.
             map.getSource('chart-points').setData(buildPoints(timestamp / 8000));
 
             // Request the next frame of the animation.
-            requestAnimationFrame(animateMarker);
+            if (limit == 2) requestAnimationFrame(animateMarker);
         }
-
-        // Start the animation.
         animateMarker(0);
+        // Start the animation.
+        // if (flag == "spiral") {
+        //     setTimeout(animateMarker(t), 5000);
+        // } else animateMarker(t);
 
 
 
@@ -554,8 +680,269 @@ function drawMap(station, dayTripInfo) {
             map.getCanvas().style.cursor = '';
             popup.remove();
         });
+
+        map.on('mouseenter', 'route', function(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'route', function() {
+            map.getCanvas().style.cursor = '';
+            // popup.remove();
+        });
+        map.on('click', 'route', function(e) {
+            if (mainChart.Msg_pop)
+                mainChart.Msg_pop.remove();
+            var from = e.features[0]._vectorTileFeature.properties.fromStation;
+            var to = e.features[0]._vectorTileFeature.properties.toStation;
+            console.log(from);
+            console.log(to);
+            var flag = "map";
+            sendBarReq(from, to, flag);
+            // mainChart.Msg_pop = new mapboxgl.Popup()
+            //     .setLngLat(e.features[0].geometry.coordinates)
+            //     .setHTML(e.features[0].properties.description)
+            //     .addTo(map);
+
+            // update_radar(e.features[0].properties.station_id, mainChart.date_extent);
+
+        });
+    });
+    // map.setLayoutProperty('station', 'visibility', 'visible');
+    // map.setLayoutProperty('route', 'visibility', 'visible');
+    // map.setLayoutProperty('chart-points', 'visibility', 'visible');
+    // map.setLayoutProperty('heatMap', 'visibility', 'none');
+}
+
+// 统计各站点OD中总的出现次数，和wordCloud方法一样。数据需要经纬度、该站点的总出次数
+function initHeatMap(mapData, tripData) {
+
+    var nest = d3.nest().key(function(d) { return d.from_station_id })
+    var O = nest.entries(tripData);
+    //计算每个车站O出现次数
+    //console.log(s);
+    // var sum=0;
+    // var num=0;
+    O.forEach(function(d) {
+        // d.from_station_id = d.values[0].from_station_id;
+        var useTime = d.values.length;
+        d.fromSum = useTime;
+
+    });
+
+    var nest = d3.nest().key(function(d) { return d.to_station_id })
+    var D = nest.entries(tripData);
+    D.forEach(function(d) {
+        d.toSum = d.values.length;
+        d.flag = 0;
+    });
+
+    //console.log(O);
+    var wordData = [];
+    O.forEach(function(d) {
+        d.flag = 0;
+        for (i = 0; i < D.length; i++) {
+            // 还没找到O D里两个相等
+            if (d.flag == 0) {
+                sumUse = d.fromSum + D[i].toSum;
+                if (d.key == D[i].key && (sumUse) > 4) {
+                    // 表示在O D中找到了匹配的值
+                    D[i].flag = 1;
+                    d.flag = 1;
+                    wordData.push({ key: d.key, useTime: parseInt(sumUse), station_id: d.values[0].from_station_id });
+                }
+            }
+        }
+    })
+    O.forEach(function(d) {
+        if (d.flag == 0) {
+            wordData.push({ key: d.key, useTime: parseInt(d.fromSum), station_id: d.values[0].from_station_id });
+        }
+    })
+
+    D.forEach(function(d) {
+            if (d.flag == 0) {
+                wordData.push({ key: d.key, useTime: parseInt(d.toSum), station_id: d.values[0].to_station_id });
+            }
+        })
+        // console.log(O);
+        // console.log(D);
+        // console.log(wordData);
+        // console.log(mapData);
+        // 将站点经纬度存入wordData
+    wordData.forEach(function(d) {
+            for (i = 0; i < mapData.length; i++) {
+                if (d.station_id == mapData[i].station_id) {
+                    d.lat = mapData[i].lat;
+                    d.long = mapData[i].long;
+                }
+            }
+        })
+        // 热力图要根据相同点的个数来确定颜色
+    wordData.forEach(function(d) {
+        for (i = 0; i < d.useTime - 1; i++) {
+            wordData.push({ key: d.key, useTime: d.useTime, station_id: d.station_id, lat: d.lat, long: d.long });
+        }
+    })
+    console.log("热力图统计OD总出现次数");
+    console.log(wordData);
+
+
+
+    heatFeatures = [];
+    var max = 1;
+    wordData.forEach(function(d) {
+        if (d.useTime > max) max = d.useTime;
+        heatFeatures.push({
+            "type": "Feature", //则该对象必须有属性 geometry，其值为一个几何对象；此外还有一个属性 properties，可以是任意 JSON 或 null
+            //properties里面可以封装各种属性，例如名称、标识颜色
+            "properties": {
+                "sum": d.useTime
+            },
+
+            "geometry": {
+                "type": "Point",
+                "coordinates": [d.long, d.lat]
+            }
+        });
+    });
+    max *= 1.2;
+    data_point = {
+        "type": "FeatureCollection", //则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
+        "features": heatFeatures
+    };
+
+    map.on('load', function() {
+        map.addSource('heat_source', {
+            type: 'geojson',
+            data: data_point
+        });
+
+        map.addLayer({
+            "id": "heatMap",
+            "type": "heatmap",
+            "layout": {
+                'visibility': 'none'
+            },
+            "source": "heat_source",
+            "maxzoom": 14,
+            "paint": {
+                "heatmap-weight": [
+                    "interpolate", ["linear"],
+                    ["get", "sum"],
+                    0, 0,
+                    max, 1
+                ],
+                "heatmap-intensity": [
+                    "interpolate", ["linear"],
+                    ["zoom"],
+                    7, 0,
+                    14, 1
+                ],
+                "heatmap-color": [
+                    "interpolate", ["linear"],
+                    ["heatmap-density"],
+                    0, "rgba(33,102,172,0)",
+                    // 中蓝色
+                    0.2, "rgb(65,105,255)",
+                    // 荧光绿
+                    0.4, "rgb(0,250,154)",
+                    // 黄绿色
+                    0.6, "rgb(175,255,43)",
+                    // 亮黄色
+                    0.8, "rgb(255,255,10)",
+                    // 红色
+                    1, "rgb(255,0,0)"
+                ],
+                "heatmap-radius": [
+                    "interpolate", ["linear"],
+                    ["zoom"],
+                    7, 4,
+                    14, 14
+                ],
+                "heatmap-opacity": [
+                    "interpolate", ["linear"],
+                    ["zoom"],
+                    8, 0,
+                    20, 1
+                ]
+            }
+        }, 'waterway-label');
+    });
+
+}
+initTool();
+
+function initTool() {
+    //加装btn的div
+    var mainChart_tool = d3.select("#map")
+        .append("div")
+        .attr("class", "btn_div")
+        .style({
+            "position": "absolute",
+            "float": "left",
+            // z-index数值越大，显示地越靠前
+            "z-index": "999",
+            "left": "0.5%",
+            "top": "6%"
+        })
+        //设置日历和刷新按钮
+        .selectAll("btn btn-default")
+        .data(["change"])
+        .enter()
+        .append("button")
+        .attr({
+            "id": function(d) {
+                return d;
+            },
+            "type": "button",
+            "class": "btn btn-default"
+        })
+        // 悬浮时的提示框
+        .attr("title", "切换视图");
+
+    //图标设置
+    mainChart_tool.append("span")
+        .attr("class", "glyphicon glyphicon-transfer")
+        // 为了避免 屏幕识读设备抓取非故意的和可能产生混淆的输出内容（尤其是当图标纯粹作为装饰用途时），
+        // 我们为这些图标设置了 aria-hidden="true" 属性。
+        .attr("aria-hidden", true);
+
+    // 点击那三个按钮的响应
+    mainChart_tool.on("click", function(d) {
+        mainChart.map_view.OD = !mainChart.map_view.OD;
+        mainChart.map_view.heatmap = !mainChart.map_view.heatmap;
+
+        // map.setLayoutProperty('section', 'visibility', 'visible');
+        if (mainChart.map_view.OD) {
+            map.setLayoutProperty('station', 'visibility', 'visible');
+            map.setPaintProperty('station', 'circle-opacity', 1);
+            map.setPaintProperty('station', 'circle-stroke-width', 1);
+            map.setLayoutProperty('route', 'visibility', 'visible');
+            map.setLayoutProperty('', 'visibility', 'visible');
+        } else {
+            map.setLayoutProperty('chart-point', 'visibility', 'none');
+            map.setLayoutProperty('route', 'visibility', 'none');
+            // map.setLayoutProperty('section', 'visibility', 'none');
+            // map.setLayoutProperty('station', 'visibility', 'none');
+            // map.setLayoutProperty('section-hover', 'visibility', 'none');
+            // map.setLayoutProperty('station-hover', 'visibility', 'none');
+            // d3.select(this).select("span").attr("class", "glyphicon glyphicon-eye-close");
+        }
+        if (mainChart.map_view.heatmap) {
+            map.setLayoutProperty('station', 'visibility', 'visible');
+            map.setPaintProperty('station', 'circle-opacity', 0);
+            map.setPaintProperty('station', 'circle-stroke-width', 0);
+            map.setLayoutProperty('heatMap', 'visibility', 'visible');
+        } else {
+            map.setLayoutProperty('heatMap', 'visibility', 'none');
+        }
+
+        if (mainChart.Msg_pop)
+            mainChart.Msg_pop.remove();
+
     });
 }
+
 
 
 

@@ -241,20 +241,20 @@ function handleWeaSta(data, Data) {
     var Count = [];
     var wSum = 0;
     windNest.forEach(function(d) {
-        for (var i = 0; i < d.values.length; i++) {
-            wSum = 0;
-            length = d.values[i].values.length;
-            for (var j = 0; j < length; j++) {
+            for (var i = 0; i < d.values.length; i++) {
+                wSum = 0;
+                length = d.values[i].values.length;
+                for (var j = 0; j < length; j++) {
 
-                wSum += d.values[i].values[j].totalSum;
-                // if (d.key == "UW-02") console.log(wSum);
+                    wSum += d.values[i].values[j].totalSum;
+                    // if (d.key == "UW-02") console.log(wSum);
+                }
+
+                Count.push({ ID: d.key, Index: d.values[i].key, sum: Math.ceil(wSum / length) });
             }
 
-            Count.push({ ID: d.key, Index: d.values[i].key, sum: Math.ceil(wSum / length) });
-        }
-
-    })
-    console.log(Count);
+        })
+        //console.log(Count);
     rainNest.forEach(function(d) {
         for (var i = 0; i < d.values.length; i++) {
             wSum = 0;
@@ -335,8 +335,8 @@ function handleWeaSta(data, Data) {
     drawWeather(viewData);
     // console.log("CountNest");
     // console.log(CountNest);
-    console.log("viewData");
-    console.log(viewData);
+    // console.log("viewData");
+    // console.log(viewData);
 }
 
 

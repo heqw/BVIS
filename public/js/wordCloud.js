@@ -118,7 +118,7 @@ function figureTime(data) {
     // console.log("word");
     // console.log(word);
     // console.log("sort15");
-    console.log(sort15);
+    // console.log(sort15);
     draw(sort15);
 }
 
@@ -166,8 +166,8 @@ function draw(drawData) {
     var cloud = $("#wordCloudView");
     var width = cloud.width();
     var height = cloud.height();
-    console.log(width);
-    console.log(height);
+    // console.log(width);
+    // console.log(height);
     var cloud_div = d3.select("#wordCloudView")
         .append("div")
         .attr("id", "cloud_div")
@@ -318,7 +318,7 @@ function draw(drawData) {
         // 如果想改变他的速度的话，你就改变：mouseX/=5;mouseY/=5;后面数越大，速度越慢
         mouseX /= 5;
         mouseY /= 5;
-        console.log(mouseX, mouseY);
+        //console.log(mouseX, mouseY);
     };
     // oDiv.οnmοusemοve = function(event) {
     //     console.log(event);

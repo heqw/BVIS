@@ -221,6 +221,12 @@ function drawSpiral(data_10min) {
         .attr("transform", function(d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")";
         })
+        .on("click", function(d) {
+            // console.log(d.date);
+
+            var flag = "spiral";
+            DrawStation(flag, d.date);
+        })
         .on('mouseover', function(d) {
             d3.select("#spiralLine").selectAll("rect")
                 .style("opacity", 0.3);

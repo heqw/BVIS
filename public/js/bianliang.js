@@ -1,5 +1,5 @@
 // 2014 - 10 - 12T16: 00: 00.000Z 输出的是UTC时间？？？
-var dateBian = new Date("2014/11/1"); //console.log(typeof(datebian));
+var dateBian = new Date("2014/10/13"); //console.log(typeof(datebian));
 //datebian.setDate(10);
 //console.log('datebian'); console.log(datebian);
 var a;
@@ -114,7 +114,8 @@ function getInfo(datebian) {
         weekEndYear: weekendyear
     };
 
-} //console.log(a);//console.log(new Date());
+}
+console.log(a); //console.log(new Date());
 // console.log(weekstart);
 // console.log(weekend);
 var lastDatebian = a.getdate;

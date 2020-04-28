@@ -1,6 +1,9 @@
-sendTimeReq();
+var flag = "bar";
+var from = "PS-04";
+var to = "PS-04";
+sendBarReq(from, to, flag);
 
-function sendTimeReq() {
+function sendBarReq(from, to, flag) {
     $.ajax({
         url: "http://localhost:3000/spiralLineData",
         dataType: "json",
@@ -24,18 +27,34 @@ function sendTimeReq() {
             //     // getUTCDay() 方法以世界时为标准，返回一个指定的日期对象为一星期中的第几天，0 代表星期天
             //     d.week = new Date(d.start_time).getUTCDay();
             // }); //console.log(data);
-            barData(data);
+            barData(data, from, to, flag);
         },
         complete: function() {},
         error: function() {},
     });
 }
 
-function barData(data) {
+function barData(data, from, to, flag) {
+    var getData = [];
+    var limit = 2;
+    if (flag == "map") {
+        data.forEach(function(d) {
+            if (d.from_station_id == from && d.to_station_id == to)
+                getData.push({
+                    start_time: d.start_time,
+                    from_station_id: d.from_station_id,
+                    to_station_id: d.to_station_id,
+                    user_type: d.user_type
+                })
+        })
+        limit = 0;
+    } else getData = data;
 
     var memberBar = [];
     //   var memberTo = [];
-    data.forEach(function(d) {
+    console.log("getData:根据flag处理后的数据");
+    console.log(getData);
+    getData.forEach(function(d) {
         if (d.user_type == "Member")
             memberBar.push({ start_time: d.start_time, from_station: d.from_station_id, to_station: d.to_station_id });
     });
@@ -44,7 +63,8 @@ function barData(data) {
         return d.start_time;
     });
     var timeNest = nest.entries(memberBar);
-    // console.log(timeNest);
+    console.log("timeNest");
+    console.log(timeNest);
     // // 在某个时间点,OD分别的使用次数
     // spiralNest.forEach(function (d, i) {
     //   d.values = d.values.length;
@@ -52,17 +72,21 @@ function barData(data) {
     // console.log('spiralNest');console.log(spiralNest);
 
     // dateExtent 例：[[6:30],[22:30]]
-    var dateExtent = d3.extent(timeNest, function(d) {
-        // getDate() setMinute()这些函数的对象是Date对象，所以要将UTC转为date,中国时间
-        return new Date(d.key);
-    });
+    // 如果全是普通会员，timeNest就会为空，ateExtent[0]则报错
+    if (timeNest.length >= 2)
+        var dateExtent = d3.extent(timeNest, function(d) {
+            // getDate() setMinute()这些函数的对象是Date对象，所以要将UTC转为date,中国时间
+            return new Date(d.key);
+        });
+    else if (timeNest.length == 1) var dateExtent = [new Date(timeNest[0].key), new Date(timeNest[0].key)];
+    else var dateExtent = [a.getdate, a.getdate];
     // 开始时间的分设为0
     dateExtent[0].setMinutes(0);
     // 结束时间分设为0
     dateExtent[1].setMinutes(0);
     // 设置结束时间的时加一，也就是时向上取整时 [[6:00],[23:00]
     dateExtent[1].setHours(dateExtent[1].getHours() + 1);
-    //console.log(dateExtent);
+    console.log(dateExtent);
     //保存三十分钟内的OD
     var data_30min = [];
     // getTime()	返回 1970 年 1 月 1 日至今的毫秒数。 1000毫秒=1秒 以10分为一个增长，暂称为刻度时间
@@ -111,7 +135,7 @@ function barData(data) {
             }
         });
     }
-    // console.log(data_30min);
+    console.log(data_30min);
     // 为了统计三十分钟内O D的最大值
     var nest = d3.nest()
         .key(function(d) { return d.date; })
@@ -122,8 +146,8 @@ function barData(data) {
         .key(function(d) { return d.date; })
         .key(function(d) { return d.to; });
     var to_30min = nest.entries(data_30min);
-    // console.log(from_30min);
-    // console.log(to_30min);
+    console.log(from_30min);
+    console.log(to_30min);
     // 半小时内 OD最大值和ID
     var from = [];
     var to = [];
@@ -177,7 +201,9 @@ function barData(data) {
     var ftdata = [];
 
     for (var i = 0; i < to_30min.length; i++) {
-        if (from[i].hminFrom == to[i].hminTo && (from[i].fromSum > 2 || to[i].toSum > 2)) {
+        console.log("limit");
+        console.log(limit);
+        if (from[i].hminFrom == to[i].hminTo && (from[i].fromSum > limit || to[i].toSum > limit)) {
             //console.log(from_30min[i]);
             // if (from[i].fromSum < 3) from[i].fromSum = 0;
             // if (to[i].toSum < 3) to[i].toSum = 0;
@@ -230,9 +256,9 @@ function barData(data) {
 // }
 
 function drawBar(data) {
-    // console.log("Bardata");
-    // console.log(data);
-
+    console.log("Bardata:画bar的数据");
+    console.log(data);
+    if (d3.select("#bar_svg")) d3.select("#bar_svg").remove();
     var time_line_wh = $("#barView");
     //#time_line 各个方向减20
     var margin = { top: 0, right: 0, bottom: 10, left: 0 },
@@ -258,6 +284,7 @@ function drawBar(data) {
         d.valores[1].OD = d.toID;
         //}
     });
+    console.log("data：统计了valores的画bar的数据");
     console.log(data);
     // console.log(data[0].valores);
     // console.log(data[1].valores);
@@ -296,6 +323,7 @@ function drawBar(data) {
 
     //添加svg并且设置宽高并且添加一个g和偏移
     var svg = d3.select("#barView").append("svg")
+        .attr("id", "bar_svg")
         .attr("width", width)
         .attr("height", height)
         .append("g")
