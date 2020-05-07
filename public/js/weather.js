@@ -51,6 +51,7 @@ function sendWeather(data) {
             // data.forEach(function(d) {
             //     d.week = new Date(d.start_time).getUTCDay();
             // });
+            stationNumber(data, Data);
             handleWeaSta(data, Data);
         },
         complete: function() {},
@@ -58,66 +59,130 @@ function sendWeather(data) {
     });
 }
 
-// // data是weather的数据 Data是trip的数据
-function handleWeaSta(data, Data) {
-    //console.log(data);
-    // var nest = d3.nest().key(function(d) {
-    //         return new Date(d.start_time).getDate();
-    //     })
-    //     // 以号数为key
-    // var stationNest = nest.entries(Data);
-    // // console.log("stationNest");
-    // // console.log(stationNest);
 
-    // // 以号数为key后，以from_station_id to_station_id
-    // var nest = d3.nest().key(function(d) { return d.from_station_id; })
-    // var fromNest = nest.entries(stationNest);
+function stationNumber(data, Data) {
+    $.ajax({
 
-    // var nest = d3.nest().key(function(d) { return d.to_station_id; })
-    // var toNest = nest.entries(stationNest);
+        url: "http://localhost:3000/station",
+        dataType: 'json',
+        crossDomain: false,
+        data: {},
+        async: true,
+        type: "GET",
+        contentType: "application/json",
+        beforeSend: function() {},
+        success: function(stationId, textStatus) {
+            var station = [];
+            var i = 0;
+            // 给站点编码
+            stationId.forEach(function(d) {
+                i++;
+                if (i < 10) i = "0" + i;
+                // 必须要变成字符型，要不然后面组合得到路线时会当成加法
+                else i = i.toString();
+                station.push({ station_id: d.station_id, id: i });
+            })
+            console.log(station);
+            handleWeaSta(data, Data, station);
+        },
+        complete: function() {},
+        error: function() {}
+    });
+}
 
-    // 筛选会员
-    var memberData = [];
+// // data是weather的数据 Data是trip的数据,station是stationID与其对应的编码
+function handleWeaSta(data, Data, station) {
+
+    var od = [];
+    // 统计线路，和map中方法一样
+    // 筛选出有用的信息 存到新数组
     Data.forEach(function(d) {
+        // 筛选会员
         if (d.user_type == "Member")
-            memberData.push({ start_time: d.start_time, from_station_id: d.from_station_id, to_station_id: d.to_station_id });
-    })
-
-    // 先以号数为key,再分别以O D为key，主要为了得到在一天内O  D 的使用数，相加得当天单车站的总使用量
+            od.push({ start_time: d.start_time, odFrom: d.from_station_id, odTo: d.to_station_id });
+    });
     var nest = d3.nest()
         .key(function(d) { return new Date(d.start_time).getDate(); })
-        .key(function(d) { return d.from_station_id; });
-    var fromNest = nest.entries(memberData);
+        .key(function(d) { return d.odFrom; })
+        .key(function(d) { return d.odTo; });
+    var odnest = nest.entries(od);
+    console.log('odnest:');
+    console.log(odnest);
 
-    var nest = d3.nest()
-        .key(function(d) { return new Date(d.start_time).getDate(); })
-        .key(function(d) { return d.to_station_id; });
-    var toNest = nest.entries(memberData);
+    // 存储号数 路线的起点 终点 路线骑行次数
+    var trips = [];
+    odnest.forEach(function(d) {
+        var i, j;
+        // d.values 是不同的起点
+        for (i = 0; i < d.values.length; i++)
+            for (j = 0; j < d.values[i].values.length; j++)
+                trips.push({
+                    date: d.key,
+                    tripsFrom: d.values[i].key,
+                    tripsTo: d.values[i].values[j].key,
+                    tripsSum: d.values[i].values[j].values.length
+                });
+    });
+    console.log(trips);
+    // 旧的处理站点的代码
+    // //console.log(data);
+    // // var nest = d3.nest().key(function(d) {
+    // //         return new Date(d.start_time).getDate();
+    // //     })
+    // //     // 以号数为key
+    // // var stationNest = nest.entries(Data);
+    // // // console.log("stationNest");
+    // // // console.log(stationNest);
 
-    // console.log("fromNest");
-    // console.log(fromNest);
-    // console.log("toNest");
-    // console.log(toNest);
+    // // // 以号数为key后，以from_station_id to_station_id
+    // // var nest = d3.nest().key(function(d) { return d.from_station_id; })
+    // // var fromNest = nest.entries(stationNest);
+
+    // // var nest = d3.nest().key(function(d) { return d.to_station_id; })
+    // // var toNest = nest.entries(stationNest);
+
+    // // 筛选会员
+    // var memberData = [];
+    // Data.forEach(function(d) {
+    //     if (d.user_type == "Member")
+    //         memberData.push({ start_time: d.start_time, from_station_id: d.from_station_id, to_station_id: d.to_station_id });
+    // })
+
+    // // 先以号数为key,再分别以O D为key，主要为了得到在一天内O  D 的使用数，相加得当天单车站的总使用量
+    // var nest = d3.nest()
+    //     .key(function(d) { return new Date(d.start_time).getDate(); })
+    //     .key(function(d) { return d.from_station_id; });
+    // var fromNest = nest.entries(memberData);
+
+    // var nest = d3.nest()
+    //     .key(function(d) { return new Date(d.start_time).getDate(); })
+    //     .key(function(d) { return d.to_station_id; });
+    // var toNest = nest.entries(memberData);
+
+    // // console.log("fromNest");
+    // // console.log(fromNest);
+    // // console.log("toNest");
+    // // console.log(toNest);
 
 
-    // 统计 当天各车站的O D 使用次数
-    var fromInfo = [];
-    var toInfo = [];
-    fromNest.forEach(function(d) {
-        //d.values[i].fromSum = d.values[i].length;
-        for (var i = 0; i < d.values.length; i++) {
-            fromInfo.push({ date: d.key, fromID: d.values[i].key, fromSum: d.values[i].values.length });
-        }
-    })
-    toNest.forEach(function(d) {
-            for (var i = 0; i < d.values.length; i++) {
-                toInfo.push({ date: d.key, toID: d.values[i].key, toSum: d.values[i].values.length, flag: 0 });
-            }
-        })
-        // console.log("fromInfo");
-        // console.log(fromInfo);
-        // console.log("toInfo");
-        // console.log(toInfo);
+    // // 统计 当天各车站的O D 使用次数
+    // var fromInfo = [];
+    // var toInfo = [];
+    // fromNest.forEach(function(d) {
+    //     //d.values[i].fromSum = d.values[i].length;
+    //     for (var i = 0; i < d.values.length; i++) {
+    //         fromInfo.push({ date: d.key, fromID: d.values[i].key, fromSum: d.values[i].values.length });
+    //     }
+    // })
+    // toNest.forEach(function(d) {
+    //         for (var i = 0; i < d.values.length; i++) {
+    //             toInfo.push({ date: d.key, toID: d.values[i].key, toSum: d.values[i].values.length, flag: 0 });
+    //         }
+    //     })
+    //     // console.log("fromInfo");
+    //     // console.log(fromInfo);
+    //     // console.log("toInfo");
+    //     // console.log(toInfo);
 
 
     // 处理天气数据
@@ -172,100 +237,135 @@ function handleWeaSta(data, Data) {
         //console.log(weatherIndex);
 
 
-    // 将当天总使用量和Index 存入fromInfo
-    //  fromInfo存后有date(号数) fromID（ID） fromSum（O的使用量） totalSum（总使用量）wind rain tem
-    fromInfo.forEach(function(d) {
-            // 有的车站可能只有O 没有D
-            // 有个问题：如果D中有O中没有的ID 这样操作会漏掉D
-            // 先把D中有的放进O 再求和 加index
-            // d.totalSum = d.fromSum;
-            toInfo.forEach(function(i) {
-                    // 用来判断D中的每一个车站是否都放进O中
-                    // i.flag = 0;
-                    if (d.date == i.date && d.fromID == i.toID) {
-                        // d.totalSum = d.fromSum + i.toSum;
-                        i.flag = 1;
-                        //d.flag=1;
-                    }
+    // 旧的处理站点的代码
+    // // 将当天总使用量和Index 存入fromInfo
+    // //  fromInfo存后有date(号数) fromID（ID） fromSum（O的使用量） totalSum（总使用量）wind rain tem
+    // fromInfo.forEach(function(d) {
+    //         // 有的车站可能只有O 没有D
+    //         // 有个问题：如果D中有O中没有的ID 这样操作会漏掉D
+    //         // 先把D中有的放进O 再求和 加index
+    //         // d.totalSum = d.fromSum;
+    //         toInfo.forEach(function(i) {
+    //                 // 用来判断D中的每一个车站是否都放进O中
+    //                 // i.flag = 0;
+    //                 if (d.date == i.date && d.fromID == i.toID) {
+    //                     // d.totalSum = d.fromSum + i.toSum;
+    //                     i.flag = 1;
+    //                     //d.flag=1;
+    //                 }
 
-                })
-                // weatherIndex.forEach(function(j) {
-                //     if (d.date == j.date) {
-                //         d.rain = j.rainIndex;
-                //         d.wind = j.windIndex;
-                //         d.tem = j.temIndex;
-                //     }
-                // })
-        })
-        // 将D中没有放进O的车站信息放入O
-    toInfo.forEach(function(d) {
-            if (d.flag == 0 || d.flag == "0")
-                fromInfo.push({ date: d.date, fromSum: 0, fromID: d.toID, totalSum: d.toSum });
-        })
-        // 加totalSum Index
-    fromInfo.forEach(function(d) {
-            d.totalSum = d.fromSum;
-            toInfo.forEach(function(i) {
-                if (d.date == i.date && d.fromID == i.toID) {
-                    d.totalSum = d.fromSum + i.toSum;
-                }
-            })
-            weatherIndex.forEach(function(j) {
-                if (d.date == j.date) {
-                    d.rain = j.rainIndex;
-                    d.wind = j.windIndex;
-                    d.tem = j.temIndex;
-                }
-            })
-        })
-        // console.log("fromInfo");
-        // console.log(fromInfo);
+    //             })
+    //             // weatherIndex.forEach(function(j) {
+    //             //     if (d.date == j.date) {
+    //             //         d.rain = j.rainIndex;
+    //             //         d.wind = j.windIndex;
+    //             //         d.tem = j.temIndex;
+    //             //     }
+    //             // })
+    //     })
+    //     // 将D中没有放进O的车站信息放入O
+    // toInfo.forEach(function(d) {
+    //         if (d.flag == 0 || d.flag == "0")
+    //             fromInfo.push({ date: d.date, fromSum: 0, fromID: d.toID, totalSum: d.toSum });
+    //     })
+    //     // 加totalSum Index
+    // fromInfo.forEach(function(d) {
+    //         d.totalSum = d.fromSum;
+    //         toInfo.forEach(function(i) {
+    //             if (d.date == i.date && d.fromID == i.toID) {
+    //                 d.totalSum = d.fromSum + i.toSum;
+    //             }
+    //         })
+    //         weatherIndex.forEach(function(j) {
+    //             if (d.date == j.date) {
+    //                 d.rain = j.rainIndex;
+    //                 d.wind = j.windIndex;
+    //                 d.tem = j.temIndex;
+    //             }
+    //         })
+    //     })
+    //     // console.log("fromInfo");
+    //     // console.log(fromInfo);
 
-    // 按ID排序，为了根据wind rain tem得到各个天气情况的使用次数
+    // 处理路线：trips数组中添加路线的id和天气系数
+    trips.forEach(function(d) {
+        // 添加id
+        for (i = 0; i < station.length; i++) {
+            var from, to;
+            if (d.tripsFrom == station[i].station_id) from = station[i].id;
+            if (d.tripsTo == station[i].station_id) to = station[i].id;
+            d.route = from + to;
+        }
+        // 添加天气系数
+        weatherIndex.forEach(function(j) {
+            if (d.date == j.date) {
+                d.rain = j.rainIndex;
+                d.wind = j.windIndex;
+                d.tem = j.temIndex;
+            }
+        })
+    });
+    console.log("加入路线编号的trips");
+    console.log(trips);
+
+    // 旧代码
+    // 按路线route排序，为了根据wind rain tem得到各个天气情况的使用次数
     var nest = d3.nest()
-        .key(function(d) { return d.fromID; })
+        .key(function(d) { return d.route; })
         .key(function(d) { return d.wind; })
-    var windNest = nest.entries(fromInfo);
+    var windNest = nest.entries(trips);
     var nest = d3.nest()
-        .key(function(d) { return d.fromID; })
+        .key(function(d) { return d.route; })
         .key(function(d) { return d.rain; })
-    var rainNest = nest.entries(fromInfo);
+    var rainNest = nest.entries(trips);
     var nest = d3.nest()
-        .key(function(d) { return d.fromID; })
+        .key(function(d) { return d.route; })
         .key(function(d) { return d.tem; })
-    var temNest = nest.entries(fromInfo);
+    var temNest = nest.entries(trips);
 
-    // console.log("windNest");
-    // console.log(windNest);
+    console.log("windNest");
+    console.log(windNest);
     // Count[]存储ID ，天气系数，两者对应的车站使用次数
     var Count = [];
     var wSum = 0;
     windNest.forEach(function(d) {
-            for (var i = 0; i < d.values.length; i++) {
-                wSum = 0;
-                length = d.values[i].values.length;
-                for (var j = 0; j < length; j++) {
+        for (var i = 0; i < d.values.length; i++) {
+            wSum = 0;
+            length = d.values[i].values.length;
+            for (var j = 0; j < length; j++) {
 
-                    wSum += d.values[i].values[j].totalSum;
-                    // if (d.key == "UW-02") console.log(wSum);
-                }
-
-                Count.push({ ID: d.key, Index: d.values[i].key, sum: Math.ceil(wSum / length) });
+                wSum += d.values[i].values[j].tripsSum;
+                // if (d.key == "UW-02") console.log(wSum);
             }
 
-        })
-        //console.log(Count);
+            Count.push({
+                route: d.key,
+                Index: d.values[i].key,
+                sum: Math.ceil(wSum / length),
+                tripsFrom: d.values[i].values[0].tripsFrom,
+                tripsTo: d.values[i].values[0].tripsTo
+            });
+        }
+
+    })
+
     rainNest.forEach(function(d) {
         for (var i = 0; i < d.values.length; i++) {
             wSum = 0;
             length = d.values[i].values.length;
             for (var j = 0; j < length; j++) {
 
-                wSum += d.values[i].values[j].totalSum;
+                wSum += d.values[i].values[j].tripsSum;
                 // if (d.key == "UW-02") console.log(wSum);
             }
 
-            Count.push({ ID: d.key, Index: d.values[i].key, sum: Math.ceil(wSum / length) });
+            Count.push({
+                route: d.key,
+                Index: d.values[i].key,
+                sum: Math.ceil(wSum / length),
+                tripsFrom: d.values[i].values[0].tripsFrom,
+                tripsTo: d.values[i].values[0].tripsTo
+            });
         }
 
     })
@@ -275,11 +375,17 @@ function handleWeaSta(data, Data) {
                 length = d.values[i].values.length;
                 for (var j = 0; j < length; j++) {
 
-                    wSum += d.values[i].values[j].totalSum;
+                    wSum += d.values[i].values[j].tripsSum;
                     // if (d.key == "UW-02") console.log(wSum);
                 }
 
-                Count.push({ ID: d.key, Index: d.values[i].key, sum: Math.ceil(wSum / length) });
+                Count.push({
+                    route: d.key,
+                    Index: d.values[i].key,
+                    sum: Math.ceil(wSum / length),
+                    tripsFrom: d.values[i].values[0].tripsFrom,
+                    tripsTo: d.values[i].values[0].tripsTo
+                });
             }
 
         })
@@ -287,21 +393,34 @@ function handleWeaSta(data, Data) {
         // console.log(Count);
 
     var nest = d3.nest()
-        .key(function(d) { return d.ID; });
+        .key(function(d) { return d.route; });
     var CountNest = nest.entries(Count);
-    // console.log("CountNest");
-    // console.log(CountNest);
-    var total = 0;
-    // 计算每个单车的总使用量，以便排序，选择使用量最多的显示
+    console.log("CountNest");
+    console.log(CountNest);
+
     CountNest.forEach(function(d) {
-            total = 0;
-            for (var i = 0; i < d.values.length; i++) {
-                total += d.values[i].sum;
-            }
-            d.total = total;
-        })
-        // console.log("CountNest计算total");
-        // console.log(CountNest);
+        var fangcha = 0;
+        var average = 0;
+        var total = 0;
+        // 求平均数
+        for (var i = 0; i < d.values.length; i++) {
+            total += d.values[i].sum;
+        }
+        average = total / d.values.length;
+        d.total = total;
+        d.average = average;
+        // 求方差
+        var fangchaSum = 0;
+        for (var i = 0; i < d.values.length; i++) {
+            fangchaSum += Math.pow((d.values[i].sum - average), 2);
+        }
+        fangcha = fangchaSum / d.values.length;
+        d.fangcha = fangcha;
+    })
+    console.log("CountNest");
+    console.log(CountNest);
+
+    // 先按总量排序，再按方差排序，方便找到骑行次数较高的方差为0的线路
     CountNest.sort(function(a, b) {
         if (a.total > b.total) {
             return -1;
@@ -311,32 +430,111 @@ function handleWeaSta(data, Data) {
             return 1;
         }
     });
-    // console.log("CountNest排序后");
-    // console.log(CountNest);
+
+    CountNest.sort(function(a, b) {
+        if (a.fangcha > b.fangcha) {
+            return -1;
+        } else if (a.fangcha == b.fangcha) {
+            return 0;
+        } else {
+            return 1;
+        }
+    });
+
+    console.log("CountNest按方差排序");
+    console.log(CountNest);
 
     // 标上排名
     for (i = 0; i < CountNest.length; i++) {
         CountNest[i].sort = i;
     }
-    // console.log("CountNest排序后");
-    // console.log(CountNest);
-
     // 由于nest结构读值不方便，所以变换为普通的数组,并且只录入前15的车站
     var viewData = [];
-    var count15 = 0;
+    var count14 = 0;
     CountNest.forEach(function(d) {
-        count15++;
-        if (count15 <= 15) {
+
+        if (count14 < 7) {
+            count14++;
             for (i = 0; i < d.values.length; i++) {
-                viewData.push({ ID: d.key, sort: d.sort, Index: d.values[i].Index, sum: d.values[i].sum });
+                viewData.push({
+                    ID: d.key,
+                    sort: d.sort,
+                    Index: d.values[i].Index,
+                    sum: d.values[i].sum,
+                    fangcha: d.fangcha,
+                    tripsFrom: d.values[i].tripsFrom,
+                    tripsTo: d.values[i].tripsTo
+                });
             }
+        } else if (d.fangcha == 0 && count14 <= 14) {
+            for (i = 0; i < d.values.length; i++) {
+                viewData.push({
+                    ID: d.key,
+                    sort: count14,
+                    Index: d.values[i].Index,
+                    sum: d.values[i].sum,
+                    fangcha: d.fangcha,
+                    tripsFrom: d.values[i].tripsFrom,
+                    tripsTo: d.values[i].tripsTo
+                });
+            }
+            count14++;
         }
     })
+    console.log(viewData);
     drawWeather(viewData);
     // console.log("CountNest");
     // console.log(CountNest);
     // console.log("viewData");
     // console.log(viewData);
+
+    // 旧代码
+    // // 计算每个单车的总使用量，以便排序，选择使用量最多的显示
+    // var total = 0;
+    // CountNest.forEach(function(d) {
+    //         total = 0;
+    //         for (var i = 0; i < d.values.length; i++) {
+    //             total += d.values[i].sum;
+    //         }
+    //         d.total = total;
+    //     })
+    //     // console.log("CountNest计算total");
+    //     // console.log(CountNest);
+    // CountNest.sort(function(a, b) {
+    //     if (a.total > b.total) {
+    //         return -1;
+    //     } else if (a.total == b.total) {
+    //         return 0;
+    //     } else {
+    //         return 1;
+    //     }
+    // });
+    // // console.log("CountNest排序后");
+    // // console.log(CountNest);
+
+    // // 标上排名
+    // for (i = 0; i < CountNest.length; i++) {
+    //     CountNest[i].sort = i;
+    // }
+    // // console.log("CountNest排序后");
+    // // console.log(CountNest);
+
+    // // 由于nest结构读值不方便，所以变换为普通的数组,并且只录入前15的车站
+    // var viewData = [];
+    // var count15 = 0;
+    // CountNest.forEach(function(d) {
+    //     count15++;
+    //     if (count15 <= 15) {
+    //         for (i = 0; i < d.values.length; i++) {
+    //             viewData.push({ ID: d.key, sort: d.sort, Index: d.values[i].Index, sum: d.values[i].sum });
+    //         }
+    //     }
+    // })
+    // drawWeather(viewData);
+    // // console.log("CountNest");
+    // // console.log(CountNest);
+    // // console.log("viewData");
+    // // console.log(viewData);
 }
 
 
@@ -359,18 +557,27 @@ function drawWeather(data) {
     var colorRange = d3.range(6).map(function(i) { return "q" + i + "-6"; });
     // d3.scale.threshold - 构建一个临界值比例尺（值域离散）
     var threshold = d3.scale.threshold()
-        .domain([5, 10, 15, 20, 25])
+        .domain([1, 2, 3, 4, 5])
         // .domain([0, 10, 20, 30, 40])
         .range(colorRange);
+
 
     var findID = 0;
     data.forEach(function(d) {
             if (d.sort == findID) {
-                showID.push(d.ID);
+                showID.push({ ID: d.ID, from: d.tripsFrom, to: d.tripsTo });
                 findID++;
             }
         })
-        //console.log(showID);
+        // 旧代码
+        // var findID = 0;
+        // data.forEach(function(d) {
+        //     if (d.sort == findID) {
+        //         showID.push(d.ID);
+        //         findID++;
+        //     }
+        // })
+    console.log(showID);
 
     var svg = d3.select("#weatherView")
         .append("svg")
@@ -412,6 +619,7 @@ function drawWeather(data) {
             "text-anchor": "middle"
         });
 
+    var flag = 0;
     // 添加竖向的那个ID标签
     var sortLabels = sortLabel.selectAll(".sortLabel")
         .data(showID)
@@ -421,7 +629,7 @@ function drawWeather(data) {
         .attr("id", function(d, i) {
             return "sort" + d;
         })
-        .text(function(d) { return d; })
+        .text(function(d) { return d.ID; })
         // 2.2影响标签的起始位置，*后面应该是影响两个标签的间距
         .attr("y", function(d, i) { return (i + 3) * (gridSize + 3); })
         .attr("x", 14)
@@ -430,12 +638,41 @@ function drawWeather(data) {
         //     section_id_date(section_id, new Date(2016, 0, d, 0, 0, 0));
         // })
         .on("click", function(d) {
+            console.log(d.from);;
+            console.log(d.to);
+            if (mainChart.Msg_pop) {
+                mainChart.Msg_pop.remove();
+            }
+            if (mainChart.Msg_pop) {
+                mainChart.Msg_pop.remove();
+            }
             mainChart.data_point.features.forEach(function(s) {
-                if (s.properties.station_id === d) {
+                // if (mainChart.Msg_pop)
+                //     mainChart.Msg_pop.remove();
+                if (s.properties.station_id === d.from) {
+                    console.log("fromfromfrom");
                     map.flyTo({ center: s.geometry.coordinates });
-                    if (mainChart.Msg_pop)
-                        mainChart.Msg_pop.remove();
-                    var description = 'NAME:' + s.properties.description + '<p>' + 'ID:' + s.properties.station_id;
+                    // if (mainChart.Msg_pop && flag == 2) {
+                    //     mainChart.Msg_pop.remove();
+                    //     flag = 0;
+                    // }
+                    // flag++;
+                    var description = 'O' + '<p>' + 'NAME:' + s.properties.description + '<p>' + 'ID:' + s.properties.station_id +
+                        '    ' + 'NUM:' + s.properties.station_num;
+                    mainChart.Msg_pop = new mapboxgl.Popup()
+                        .setLngLat(s.geometry.coordinates)
+                        .setHTML(description)
+                        .addTo(map);
+                }
+                if (s.properties.station_id === d.to) {
+                    console.log("totoot");
+                    // if (mainChart.Msg_pop && flag == 2) {
+                    //     mainChart.Msg_pop.remove();
+                    //     flag = 0;
+                    // }
+                    // flag++;
+                    var description = 'D' + '<p>' + 'NAME:' + s.properties.description + '<p>' + 'ID:' + s.properties.station_id +
+                        '    ' + 'NUM:' + s.properties.station_num;
                     mainChart.Msg_pop = new mapboxgl.Popup()
                         .setLngLat(s.geometry.coordinates)
                         .setHTML(description)

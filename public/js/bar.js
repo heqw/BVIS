@@ -52,8 +52,8 @@ function barData(data, from, to, flag) {
 
     var memberBar = [];
     //   var memberTo = [];
-    console.log("getData:根据flag处理后的数据");
-    console.log(getData);
+    // console.log("getData:根据flag处理后的数据");
+    // console.log(getData);
     getData.forEach(function(d) {
         if (d.user_type == "Member")
             memberBar.push({ start_time: d.start_time, from_station: d.from_station_id, to_station: d.to_station_id });
@@ -63,8 +63,8 @@ function barData(data, from, to, flag) {
         return d.start_time;
     });
     var timeNest = nest.entries(memberBar);
-    console.log("timeNest");
-    console.log(timeNest);
+    // console.log("timeNest");
+    // console.log(timeNest);
     // // 在某个时间点,OD分别的使用次数
     // spiralNest.forEach(function (d, i) {
     //   d.values = d.values.length;
@@ -86,7 +86,7 @@ function barData(data, from, to, flag) {
     dateExtent[1].setMinutes(0);
     // 设置结束时间的时加一，也就是时向上取整时 [[6:00],[23:00]
     dateExtent[1].setHours(dateExtent[1].getHours() + 1);
-    console.log(dateExtent);
+    //console.log(dateExtent);
     //保存三十分钟内的OD
     var data_30min = [];
     // getTime()	返回 1970 年 1 月 1 日至今的毫秒数。 1000毫秒=1秒 以10分为一个增长，暂称为刻度时间
@@ -135,7 +135,7 @@ function barData(data, from, to, flag) {
             }
         });
     }
-    console.log(data_30min);
+    // console.log(data_30min);
     // 为了统计三十分钟内O D的最大值
     var nest = d3.nest()
         .key(function(d) { return d.date; })
@@ -146,8 +146,8 @@ function barData(data, from, to, flag) {
         .key(function(d) { return d.date; })
         .key(function(d) { return d.to; });
     var to_30min = nest.entries(data_30min);
-    console.log(from_30min);
-    console.log(to_30min);
+    // console.log(from_30min);
+    // console.log(to_30min);
     // 半小时内 OD最大值和ID
     var from = [];
     var to = [];
@@ -201,8 +201,8 @@ function barData(data, from, to, flag) {
     var ftdata = [];
 
     for (var i = 0; i < to_30min.length; i++) {
-        console.log("limit");
-        console.log(limit);
+        // console.log("limit");
+        // console.log(limit);
         if (from[i].hminFrom == to[i].hminTo && (from[i].fromSum > limit || to[i].toSum > limit)) {
             //console.log(from_30min[i]);
             // if (from[i].fromSum < 3) from[i].fromSum = 0;
@@ -256,8 +256,8 @@ function barData(data, from, to, flag) {
 // }
 
 function drawBar(data) {
-    console.log("Bardata:画bar的数据");
-    console.log(data);
+    // console.log("Bardata:画bar的数据");
+    // console.log(data);
     if (d3.select("#bar_svg")) d3.select("#bar_svg").remove();
     var time_line_wh = $("#barView");
     //#time_line 各个方向减20
@@ -284,8 +284,8 @@ function drawBar(data) {
         d.valores[1].OD = d.toID;
         //}
     });
-    console.log("data：统计了valores的画bar的数据");
-    console.log(data);
+    // console.log("data：统计了valores的画bar的数据");
+    // console.log(data);
     // console.log(data[0].valores);
     // console.log(data[1].valores);
     var y = d3.scale.linear()

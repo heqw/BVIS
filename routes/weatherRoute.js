@@ -78,6 +78,27 @@ router.get('/weatherStation', function(req, res, next) {
 });
 
 
+router.get('/station', function(req, res, next) {
+
+    var selectData = function(db, callback) {
+        const mydb = db.db('bikeData');
+        var collection = mydb.collection('station');
+        collection.find({}).toArray(function(err, result) {
+            if (err) {
+                console.log('Error:' + err);
+                return;
+            }
+            callback(result);
+        });
+    }
+    MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, db) {
+        selectData(db, function(result) {
+            res.json(result);
+            db.close();
+        });
+    });
+});
+
 router.get('/', function(req, res, next) {
     res.render('index', { title: 'Express' });
 });

@@ -104,8 +104,8 @@ function handleSpiralTime(data) {
 
     drawSpiral(data_10min);
 
-    console.log("data_10min:");
-    console.log(data_10min);
+    // console.log("data_10min:");
+    // console.log(data_10min);
 }
 
 function drawSpiral(data_10min) {

@@ -200,6 +200,22 @@
             height: 632px;
             background-color: #FFFFFF;
         }
+        
+        #radar {
+            position: absolute;
+            top: 16.5%;
+            left: 1%;
+            width: 20%;
+            height: 42%;
+            background-color: #EEEEEE;
+            border-radius: 10px;
+        }
+        
+        #radarView {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
     </style>
 
 </head>
@@ -209,10 +225,14 @@
         <div id=headTitle>
             <div class="titleName">共享单车数据的用户时空行为特征可视分析系统</div>
         </div>
-
+        <!-- 
         <div id="wordCloud">
             <div class="leftName">单日站点热度</div>
             <div id="wordCloudView"></div>
+        </div> -->
+        <div id="radar">
+            <div class="leftName">站点借入借出</div>
+            <div id="radarView"></div>
         </div>
 
         <div id="timeLine">
@@ -243,14 +263,14 @@
 
         <div id="calendar">
             <div class="input-append date form_datetime">
-                <input size="22" type="text" value="" name="startTime" readonly>
+                <input size="30" type="text" value="" name="startTime" readonly>
                 <span class="add-on">
                     <i class="icon-th"></i></span>
             </div>
         </div>
 </body>
 <!-- <script src="../public/js/firstReq.js"></script> -->
-<link rel="stylesheet" href="../public/stylesheets/wordCloud.css">
+<!-- <link rel="stylesheet" href="../public/stylesheets/wordCloud.css"> -->
 <link rel="stylesheet" href="../public/stylesheets/timeLine.css">
 
 <script src="../public/js/bianliang.js"></script>
@@ -260,8 +280,9 @@
 <script src="../public/js/getInfo.js"></script>
 <script src="../public/js/main.js"></script>
 <script src="../public/js/timeLine.js"></script>
-<script src="../public/js/wordCloud.js"></script>
+<!-- <script src="../public/js/wordCloud.js"></script> -->
 <script src="../public/js/bar.js"></script>
 <script src="../public/js/weather.js"></script>
+<script src="../public/js/radar.js"></script>
 
 </html>

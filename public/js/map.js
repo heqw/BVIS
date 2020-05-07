@@ -29,7 +29,7 @@ DrawStation(flag, a.getdate);
 // DrawStation();
 
 function DrawStation(flag, date) {
-    console.log(flag);
+    // console.log(flag);
     // var daytripInfo;
     // 请求的是所选当天的trip数据
     $.ajax({
@@ -77,9 +77,9 @@ function DrawStation(flag, date) {
                     // console.log(mainChart.spiralHour);
                     // console.log(mainChart.spiralMinute);
                 senddaytripInfo(tripInfo, flag);
-                console.log(tripInfo);
+                // console.log(tripInfo);
             } else senddaytripInfo(Info, flag);
-            console.log(Info);
+            //console.log(Info);
 
         },
         complete: function() {},
@@ -104,6 +104,14 @@ function senddaytripInfo(In, flag) {
         //任意命名的，在这个函数有用到。参数值是在Ajax提交成功后所返回的内容
         success: function(mapInfo, textStatus) {
             //stationInfo=mapInfo;
+            var i = 0;
+            mapInfo.forEach(function(d) {
+                i++;
+                if (i < 10) i = "0" + i;
+                // 必须要变成字符型，要不然后面组合得到路线时会当成加法
+                else i = i.toString();
+                d.num = i;
+            })
             drawMap(mapInfo, In, flag); //console.log(daytripInfo);
             initHeatMap(mapInfo, In);
         },
@@ -115,8 +123,8 @@ function senddaytripInfo(In, flag) {
 }
 
 function drawMap(station, dayTripInfo, flag) {
-    console.log("骑行数据");
-    console.log(dayTripInfo);
+    // console.log("骑行数据");
+    // console.log(dayTripInfo);
     //console.log(typeof(station));
     // stationData = station;
 
@@ -186,8 +194,8 @@ function drawMap(station, dayTripInfo, flag) {
         // map.setLayoutProperty('chart-points', 'visibility', 'none');
         // map.setLayoutProperty('heatMap', 'visibility', 'none');
     }
-    console.log("limit");
-    console.log(limit);
+    // console.log("limit");
+    // console.log(limit);
     //给每一个单车数据添加feature
     mainChart.stationFeatures = [];
 
@@ -197,6 +205,7 @@ function drawMap(station, dayTripInfo, flag) {
             //properties里面可以封装各种属性，例如名称、标识颜色
             "properties": {
                 "station_id": d.station_id,
+                "station_num": d.num,
                 // 	描写(文字); 形容; 说明; 类型
                 "description": d.name,
                 "color": "#eae33f",
@@ -293,8 +302,8 @@ function drawMap(station, dayTripInfo, flag) {
             }
         }
     });
-    console.log("trips:");
-    console.log(trips);
+    // console.log("trips:");
+    // console.log(trips);
 
 
     //data_point是车站的集合？画站点位置用
@@ -302,7 +311,7 @@ function drawMap(station, dayTripInfo, flag) {
         "type": "FeatureCollection", //则该对象必须有属性 features，其值为一个数组，每一项都是一个 Feature 对象。
         "features": mainChart.stationFeatures
     };
-    console.log(mainChart.data_point);
+    // console.log(mainChart.data_point);
 
 
 
@@ -350,8 +359,8 @@ function drawMap(station, dayTripInfo, flag) {
                 }); //console.log(Math.floor(trips[i].tripsSum / 4));
             }
         }
-        console.log("features");
-        console.log(features);
+        // console.log("features");
+        // console.log(features);
         return features;
     };
 
@@ -487,6 +496,7 @@ function drawMap(station, dayTripInfo, flag) {
     }; //console.log(data_line);
 
 
+    console.log(mainChart.data_point);
     // 加载站点
     map.on('load', function() {
         //map.addSource(id,source)id为数据源id，这些数据源名叫id;source数据源对象,描述数据？
@@ -540,8 +550,8 @@ function drawMap(station, dayTripInfo, flag) {
             /* geojson类型资源 */
             "data": data_line
         });
-        console.log("data_line");
-        console.log(data_line);
+        // console.log("data_line");
+        // console.log(data_line);
 
         map.addLayer({
             "id": "route",
@@ -591,8 +601,8 @@ function drawMap(station, dayTripInfo, flag) {
         //     }
         // });
 
-        console.log("buildPoints");
-        console.log(buildPoints(0));
+        // console.log("buildPoints");
+        // console.log(buildPoints(0));
         // 加载贝塞尔曲线动态点
         map.addSource("chart-points", {
             "type": "geojson",
@@ -679,6 +689,13 @@ function drawMap(station, dayTripInfo, flag) {
         map.on('mouseleave', 'station', function() {
             map.getCanvas().style.cursor = '';
             popup.remove();
+        });
+        // sendRadarReq(station_id);
+        map.on('click', 'station', function(e) {
+            if (mainChart.Msg_pop)
+                mainChart.Msg_pop.remove();
+            var station = e.features[0].properties.station_id;
+            sendRadarReq(station);
         });
 
         map.on('mouseenter', 'route', function(e) {
@@ -779,12 +796,12 @@ function initHeatMap(mapData, tripData) {
         })
         // 热力图要根据相同点的个数来确定颜色
     wordData.forEach(function(d) {
-        for (i = 0; i < d.useTime - 1; i++) {
-            wordData.push({ key: d.key, useTime: d.useTime, station_id: d.station_id, lat: d.lat, long: d.long });
-        }
-    })
-    console.log("热力图统计OD总出现次数");
-    console.log(wordData);
+            for (i = 0; i < d.useTime - 1; i++) {
+                wordData.push({ key: d.key, useTime: d.useTime, station_id: d.station_id, lat: d.lat, long: d.long });
+            }
+        })
+        // console.log("热力图统计OD总出现次数");
+        // console.log(wordData);
 
 
 
@@ -918,7 +935,7 @@ function initTool() {
             map.setPaintProperty('station', 'circle-opacity', 1);
             map.setPaintProperty('station', 'circle-stroke-width', 1);
             map.setLayoutProperty('route', 'visibility', 'visible');
-            map.setLayoutProperty('', 'visibility', 'visible');
+            map.setLayoutProperty('chart-point', 'visibility', 'visible');
         } else {
             map.setLayoutProperty('chart-point', 'visibility', 'none');
             map.setLayoutProperty('route', 'visibility', 'none');
